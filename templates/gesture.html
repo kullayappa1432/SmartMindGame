@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 🌟 Page Header -->
+<div style="text-align:left; margin-bottom:30px;">
+    <h1 style="font-size:32px;">✋ Gesture Control</h1>
+    <p style="color:#94a3b8;">
+        Control your system using hand gestures in real-time.
+    </p>
+</div>
+
+<!-- 📊 Layout Grid -->
+<div style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center;">
+
+    <!-- 🎥 Camera Section -->
+    <div class="card" style="width:420px;">
+
+        <h3 style="margin-bottom:15px;">Live Camera</h3>
+
+        <!-- Camera Box -->
+       <div style="position:relative;">
+<img id="video-stream" src="" style="width:100%; border-radius:10px;">
+    <div id="gesture-label"
+         style="position:absolute; top:10px; right:10px;
+                background:rgba(0,0,0,0.7);
+                padding:8px; border-radius:8px;">
+        ✋ None
+    </div>
+</div>
+
+        <!-- Status -->
+        <div id="gesture-status" class="status stopped" style="margin-top:10px;">
+            ● Stopped
+        </div>
+
+    </div>
+
+    <!-- ⚙️ Control Panel -->
+    <div class="card" style="width:320px;">
+
+        <h3 style="margin-bottom:20px;">Control Panel</h3>
+
+        <p style="color:#94a3b8;">
+            Start or stop gesture recognition system.
+        </p>
+
+        <!-- Buttons -->
+        <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+
+            <button class="btn primary" onclick="startSystem('gesture')">
+                ▶ Start
+            </button>
+
+            <button class="btn secondary" onclick="stopSystem('gesture')">
+                ■ Stop
+            </button>
+
+        </div>
+
+        <!-- Info -->
+        <div style="margin-top:20px; font-size:14px; color:#64748b;">
+            <p>✔ Move mouse using gestures</p>
+            <p>✔ AI-based tracking</p>
+            <p>✔ Real-time response</p>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    /* 🔹 Status styling */
+.status {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.running { color: #22c55e; }
+.loading { color: #facc15; }
+.stopped { color: #ef4444; }
+
+/* 📦 Card polish */
+.card {
+    background: rgba(30,41,59,0.7);
+    padding: 25px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+/* 🔘 Buttons */
+.btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.primary {
+    background: linear-gradient(90deg,#22c55e,#4ade80);
+    color: black;
+}
+
+.secondary {
+    background: linear-gradient(90deg,#ef4444,#f87171);
+    color: white;
+}
+</style>
+
+<script>
+setInterval(()=>{
+ fetch('/get-gesture')
+ .then(res=>res.json())
+ .then(data=>{
+   document.getElementById("gesture-label").innerText = data.gesture;
+ })
+ .catch(()=>{
+   document.getElementById("gesture-label").innerText = "Error";
+ })
+},500);
+</script>
+
+<script>
+let gestureRunning = false;
+
+function startSystem(type) {
+    if (type === "gesture") {
+        fetch("/start-gesture")
+        .then(() => {
+            document.getElementById("gesture-status").innerText = "● Running";
+            document.getElementById("gesture-status").className = "status running";
+
+            // 🔥 reload video after starting
+document.getElementById("video-stream").src = "/video_feed";        });
+    }
+}
+function stopSystem(type) {
+    if (type === "gesture") {
+
+        fetch("/stop-gesture")
+        .then(() => {
+            document.getElementById("gesture-status").innerText = "● Stopped";
+            document.getElementById("gesture-status").className = "status stopped";
+
+            document.getElementById("video-stream").src = "";
+        });
+    }
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 🎤 Header -->
+<div style="text-align:left; margin-bottom:30px;">
+    <h1 style="font-size:32px;">🎤 Voice Control</h1>
+    <p style="color:#94a3b8;">
+        Control your system using voice commands with real-time feedback.
+    </p>
+</div>
+
+<!-- 📊 Layout -->
+<div style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center;">
+
+    <!-- 🎧 Voice Activity Panel -->
+    <div class="card" style="width:420px; text-align:center;">
+
+        <h3 style="margin-bottom:15px;">Voice Activity</h3>
+
+        <!-- Mic Icon -->
+        <img src="{{ url_for('static', filename='images/4.png') }}" 
+             style="width:120px; margin-bottom:15px;">
+
+        <!-- Listening Indicator -->
+        <div id="voice-indicator" 
+             style="margin:15px auto; width:20px; height:20px; border-radius:50%; background:#ef4444;">
+        </div>
+
+        <!-- Status -->
+        <div id="voice-status" class="status stopped">
+            ● Not Listening
+        </div>
+
+    </div>
+
+    <!-- ⚙️ Control Panel -->
+    <div class="card" style="width:320px;">
+
+        <h3 style="margin-bottom:20px;">Control Panel</h3>
+
+        <p style="color:#94a3b8;">
+            Start or stop voice recognition system.
+        </p>
+
+        <!-- Buttons -->
+        <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+
+            <button class="btn primary" onclick="startVoiceUI()">
+                🎤 Start Listening
+            </button>
+
+            <button class="btn secondary" onclick="stopVoiceUI()">
+                ■ Stop
+            </button>
+
+        </div>
+
+        <!-- Features -->
+        <div style="margin-top:20px; font-size:14px; color:#64748b;">
+            <p>✔ Hands-free control</p>
+            <p>✔ Real-time voice commands</p>
+            <p>✔ Smart AI response</p>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ⚡ Script -->
+<script>
+function startVoiceUI() {
+
+    const status = document.getElementById("voice-status");
+    const indicator = document.getElementById("voice-indicator");
+
+    // UI update
+    status.innerText = "● Listening...";
+    status.className = "status running";
+
+    indicator.style.background = "#22c55e";
+
+    // Backend call
+    startSystem('voice');
+
+    // Voice feedback
+    speak("Voice control started");
+}
+
+function stopVoiceUI() {
+
+    const status = document.getElementById("voice-status");
+    const indicator = document.getElementById("voice-indicator");
+
+    // UI update
+    status.innerText = "● Stopped";
+    status.className = "status stopped";
+
+    indicator.style.background = "#ef4444";
+
+    // Backend call
+    stopSystem('voice');
+
+    // Voice feedback
+    speak("Voice control stopped");
+}
+</script>
+<script>
+function updateChat() {
+    fetch('/get-chat')
+    .then(res => res.json())
+    .then(data => {
+
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML = "";
+
+        data.chat.forEach(msg => {
+            const div = document.createElement("div");
+            div.classList.add("message", msg.type);
+            div.innerText = msg.text;
+            chatBox.appendChild(div);
+        });
+
+        // Auto scroll
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+
+// Refresh every second
+setInterval(updateChat, 1000);
+</script>
+
+{% endblock %}

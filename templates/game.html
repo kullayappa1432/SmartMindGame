@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 🎮 Header -->
+<div style="text-align:left; margin-bottom:30px;">
+    <h1 style="font-size:32px;">🎮 Game Control</h1>
+    <p style="color:#94a3b8;">
+        Play and control games using gesture-based AI interaction.
+    </p>
+</div>
+
+<!-- 📊 Layout -->
+<div style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center;">
+
+    <!-- 🎥 Preview Section -->
+    <div class="card" style="width:420px;">
+
+        <h3 style="margin-bottom:15px;">Game Interaction Preview</h3>
+
+        <!-- Images -->
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <img src="{{ url_for('static', filename='images/2.png') }}" 
+                 style="width:48%; border-radius:10px;">
+            <img src="{{ url_for('static', filename='images/3.png') }}" 
+                 style="width:48%; border-radius:10px;">
+        </div>
+
+        <!-- Status -->
+        <div id="game-status" class="status stopped" style="margin-top:15px;">
+            ● Stopped
+        </div>
+
+    </div>
+
+    <!-- ⚙️ Control Panel -->
+    <div class="card" style="width:320px;">
+
+        <h3 style="margin-bottom:20px;">Control Panel</h3>
+
+        <p style="color:#94a3b8;">
+            Start or stop game control system.
+        </p>
+
+        <!-- Buttons -->
+        <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+
+            <button class="btn primary" onclick="startSystem('game')">
+                ▶ Start Game Control
+            </button>
+
+            <button class="btn secondary" onclick="stopSystem('game')">
+                ■ Stop
+            </button>
+
+        </div>
+
+        <!-- Features -->
+        <div style="margin-top:20px; font-size:14px; color:#64748b;">
+            <p>✔ Gesture-based controls</p>
+            <p>✔ Real-time response</p>
+            <p>✔ Interactive gameplay</p>
+        </div>
+
+    </div>
+
+</div>
+<style>
+    /* 📦 Card UI */
+.card {
+    background: rgba(30,41,59,0.7);
+    padding: 25px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+/* 🔘 Buttons */
+.btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.primary {
+    background: linear-gradient(90deg,#22c55e,#4ade80);
+    color: black;
+}
+
+.secondary {
+    background: linear-gradient(90deg,#ef4444,#f87171);
+    color: white;
+}
+
+/* 📡 Status */
+.status {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.running { color: #22c55e; }
+.stopped { color: #ef4444; }
+.loading { color: #facc15; }
+</style>
+{% endblock %}

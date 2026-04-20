@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ title }}</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg,#0f172a,#1e293b);
+    color: white;
+}
+
+/* Navbar */
+header {
+    background: #020617;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.logo {
+    color: #38bdf8;
+    font-weight: bold;
+}
+
+nav a {
+    margin: 0 10px;
+    color: white;
+    text-decoration: none;
+}
+
+/* Sections */
+.container {
+    padding: 40px;
+    text-align: center;
+}
+
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    margin: auto;
+}
+
+img {
+    width: 120px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.start { background: #22c55e; }
+.stop { background: #ef4444; }
+
+/* Footer */
+footer {
+    background: #020617;
+    text-align: center;
+    padding: 15px;
+    margin-top: 50px;
+}
+/* 🎤 Pulsing mic effect */
+#voice-indicator {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <div class="logo">AI Control System</div>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/gesture">Gesture Mouse</a>
+        <a href="/game">Game Control</a>
+        <a href="/voice">Voice Control</a>
+    </nav>
+</header>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<footer>
+    <p>© 2026 AI Control System</p>
+</footer>
+
+<script>
+let activeSystem = null;
+
+function startSystem(type) {
+    fetch("/start-" + type);
+}
+
+function stopSystem(type) {
+    fetch("/stop-" + type);
+}
+</script>
+
+</body>
+</html>
