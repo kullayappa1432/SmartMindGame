@@ -3,8 +3,9 @@ import numpy as np
 import pyautogui
 import math
 import time
+import threading
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
 screen_w, screen_h = pyautogui.size()
 
@@ -14,7 +15,8 @@ gesture_text = "None"
 prev_x, prev_y = 0, 0
 last_click_time = 0
 
-running = False  # 🔴 control flag
+running = False
+thread = None
 
 
 def get_frame():
@@ -25,18 +27,19 @@ def get_gesture():
     return gesture_text
 
 
-def start_system():
-    global running
+def start_gesture():
+    global running, thread
     running = True
 
+    if thread is None or not thread.is_alive():
+        thread = threading.Thread(target=gesture_loop)
+        thread.daemon = True
+        thread.start()
 
-def stop_system():
+
+def stop_gesture():
     global running
     running = False
-
-
-def get_status():
-    return "RUNNING" if running else "STOPPED"
 
 
 def gesture_loop():
@@ -54,7 +57,6 @@ def gesture_loop():
 
         frame = cv2.flip(frame, 1)
 
-        # ROI
         roi = frame[100:400, 100:400]
         cv2.rectangle(frame, (100, 100), (400, 400), (255, 0, 0), 2)
 
@@ -82,7 +84,6 @@ def gesture_loop():
                 cx = x + w // 2
                 cy = y + h // 2
 
-                # Cursor mapping
                 screen_x = np.interp(cx, [0, 300], [screen_w, 0])
                 screen_y = np.interp(cy, [0, 300], [0, screen_h])
 
@@ -92,7 +93,6 @@ def gesture_loop():
                 pyautogui.moveTo(smooth_x, smooth_y)
                 prev_x, prev_y = smooth_x, smooth_y
 
-                # Convex hull
                 hull = cv2.convexHull(cnt, returnPoints=False)
 
                 defect_count = 0
@@ -119,7 +119,6 @@ def gesture_loop():
                             if angle < 90:
                                 defect_count += 1
 
-                # Gesture logic
                 if defect_count <= 1:
                     gesture_text = "FIST (CLICK)"
 
@@ -139,4 +138,3 @@ def gesture_loop():
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
 
         frame_global = frame
-   
