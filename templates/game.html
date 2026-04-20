@@ -3,7 +3,7 @@
 
 <!-- 🎮 Header -->
 <div style="text-align:left; margin-bottom:30px;">
-    <h1 style="font-size:32px;">🎮 Game Control</h1>
+    <h1 style="font-size:32px;">🎮 Gesture Game Control</h1>
     <p style="color:#94a3b8;">
         Play and control games using gesture-based AI interaction.
     </p>
@@ -15,19 +15,37 @@
     <!-- 🎥 Preview Section -->
     <div class="card" style="width:420px;">
 
-        <h3 style="margin-bottom:15px;">Game Interaction Preview</h3>
+        <h3 style="margin-bottom:15px;">🎮 Game Status</h3>
 
-        <!-- Images -->
-        <div style="display:flex; gap:10px; justify-content:center;">
-            <img src="{{ url_for('static', filename='images/2.png') }}" 
-                 style="width:48%; border-radius:10px;">
-            <img src="{{ url_for('static', filename='images/3.png') }}" 
-                 style="width:48%; border-radius:10px;">
+        <!-- Status Display -->
+        <div style="background:rgba(34,197,94,0.1); padding:15px; border-radius:8px; margin-bottom:15px; border-left:4px solid #22c55e;">
+            <p style="color:#94a3b8; margin:0 0 5px 0; font-size:12px;">CURRENT GESTURE</p>
+            <p id="game-gesture" style="color:#22c55e; margin:0; font-size:16px; font-weight:bold;">None</p>
         </div>
 
-        <!-- Status -->
-        <div id="game-status" class="status stopped" style="margin-top:15px;">
+        <!-- Game Stats -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+            <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:8px; text-align:center;">
+                <p style="color:#94a3b8; margin:0; font-size:11px;">SCORE</p>
+                <p id="game-score" style="color:#3b82f6; margin:5px 0 0 0; font-size:18px; font-weight:bold;">0</p>
+            </div>
+            <div style="background:rgba(168,85,247,0.1); padding:10px; border-radius:8px; text-align:center;">
+                <p style="color:#94a3b8; margin:0; font-size:11px;">TIME</p>
+                <p id="game-time" style="color:#a855f7; margin:5px 0 0 0; font-size:18px; font-weight:bold;">0s</p>
+            </div>
+        </div>
+
+        <!-- Game Status -->
+        <div id="game-status" class="status stopped" style="text-align:center; font-weight:bold;">
             ● Stopped
+        </div>
+
+        <!-- Preview Images -->
+        <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
+            <img src="{{ url_for('static', filename='images/2.png') }}" 
+                 style="width:48%; border-radius:8px; opacity:0.7;">
+            <img src="{{ url_for('static', filename='images/3.png') }}" 
+                 style="width:48%; border-radius:8px; opacity:0.7;">
         </div>
 
     </div>
@@ -35,77 +53,259 @@
     <!-- ⚙️ Control Panel -->
     <div class="card" style="width:320px;">
 
-        <h3 style="margin-bottom:20px;">Control Panel</h3>
+        <h3 style="margin-bottom:20px;">🎮 Control Panel</h3>
 
-        <p style="color:#94a3b8;">
-            Start or stop game control system.
-        </p>
-
-        <!-- Buttons -->
-        <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
-
-            <button class="btn primary" onclick="startSystem('game')">
-                ▶ Start Game Control
-            </button>
-
-            <button class="btn secondary" onclick="stopSystem('game')">
-                ■ Stop
-            </button>
-
+        <!-- Game Mode Selection -->
+        <div style="margin-bottom:20px;">
+            <label style="color:#94a3b8; display:block; margin-bottom:8px; font-size:12px;">GAME MODE</label>
+            <select id="game-mode" style="width:100%; padding:10px; background:#1e293b; color:#cbd5e1; border:1px solid #475569; border-radius:8px;">
+                <option value="easy">🟢 Easy</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="hard">🔴 Hard</option>
+            </select>
         </div>
 
-        <!-- Features -->
-        <div style="margin-top:20px; font-size:14px; color:#64748b;">
-            <p>✔ Gesture-based controls</p>
-            <p>✔ Real-time response</p>
-            <p>✔ Interactive gameplay</p>
+        <!-- Control Buttons -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+            <button class="btn primary" id="start-game-btn" onclick="startGame()">
+                ▶ Start Game
+            </button>
+            <button class="btn secondary" id="stop-game-btn" onclick="stopGame()" disabled>
+                ■ Stop Game
+            </button>
+        </div>
+
+        <!-- Quick Guide -->
+        <div style="background:rgba(59,130,246,0.1); padding:15px; border-radius:8px; border-left:4px solid #3b82f6;">
+            <h4 style="color:#3b82f6; margin-top:0; margin-bottom:10px;">📖 How to Play:</h4>
+            <ul style="color:#cbd5e1; margin:0; padding-left:20px; font-size:13px;">
+                <li>Use gestures to control game</li>
+                <li>Fist = Select/Click</li>
+                <li>Open hand = Move</li>
+                <li>Swipe = Navigate</li>
+            </ul>
         </div>
 
     </div>
 
 </div>
+
+<!-- 📋 Game Instructions Panel (Optional) -->
+<div id="game-instructions-panel" style="display:none; margin-top:30px;">
+    <div class="card" style="background:rgba(168,85,247,0.05); border:2px solid #a855f7;">
+        
+        <h2 style="color:#a855f7; margin-bottom:20px;">🎮 Game Control Guide</h2>
+
+        <!-- Features -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:25px;">
+            <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #22c55e;">
+                <p style="color:#22c55e; font-weight:bold; margin:0 0 5px 0;">👋 Move</p>
+                <p style="color:#94a3b8; font-size:13px; margin:0;">Use open hand to navigate</p>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #f59e0b;">
+                <p style="color:#f59e0b; font-weight:bold; margin:0 0 5px 0;">✊ Select</p>
+                <p style="color:#94a3b8; font-size:13px; margin:0;">Make a fist to click/select</p>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #ef4444;">
+                <p style="color:#ef4444; font-weight:bold; margin:0 0 5px 0;">✌️ Action</p>
+                <p style="color:#94a3b8; font-size:13px; margin:0;">Two fingers for actions</p>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #06b6d4;">
+                <p style="color:#06b6d4; font-weight:bold; margin:0 0 5px 0;">← → Scroll</p>
+                <p style="color:#94a3b8; font-size:13px; margin:0;">Swipe to scroll/navigate</p>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div style="background:rgba(34,197,94,0.1); padding:15px; border-radius:8px; border-left:4px solid #22c55e;">
+            <h4 style="color:#22c55e; margin-top:0;">💡 Pro Tips:</h4>
+            <ul style="color:#cbd5e1; margin:10px 0 0 0; padding-left:20px; font-size:13px;">
+                <li>Start with Easy mode to learn gestures</li>
+                <li>Keep consistent hand size for better tracking</li>
+                <li>Smooth movements work better than jerky ones</li>
+                <li>Use well-lit environment for best results</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
 <style>
     /* 📦 Card UI */
-.card {
-    background: rgba(30,41,59,0.7);
-    padding: 25px;
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.08);
-    transition: 0.3s;
-}
+    .card {
+        background: rgba(30,41,59,0.7);
+        padding: 25px;
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.08);
+        transition: 0.3s;
+    }
 
-.card:hover {
-    transform: translateY(-6px);
-}
+    .card:hover {
+        transform: translateY(-6px);
+    }
 
-/* 🔘 Buttons */
-.btn {
-    padding: 12px 20px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-}
+    /* 🔘 Buttons */
+    .btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
 
-.primary {
-    background: linear-gradient(90deg,#22c55e,#4ade80);
-    color: black;
-}
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-.secondary {
-    background: linear-gradient(90deg,#ef4444,#f87171);
-    color: white;
-}
+    .primary {
+        background: linear-gradient(90deg,#22c55e,#4ade80);
+        color: black;
+    }
 
-/* 📡 Status */
-.status {
-    margin-top: 10px;
-    font-size: 14px;
-}
+    .primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+    }
 
-.running { color: #22c55e; }
-.stopped { color: #ef4444; }
-.loading { color: #facc15; }
+    .secondary {
+        background: linear-gradient(90deg,#ef4444,#f87171);
+        color: white;
+    }
+
+    .secondary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    /* 📡 Status */
+    .status {
+        margin-top: 10px;
+        font-size: 14px;
+        padding: 8px;
+        border-radius: 8px;
+    }
+
+    .running { 
+        color: #22c55e;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .stopped { 
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .loading { 
+        color: #facc15;
+        background: rgba(250, 204, 21, 0.1);
+        border: 1px solid rgba(250, 204, 21, 0.3);
+    }
 </style>
+
+<script>
+let gameRunning = false;
+let gameStartTime = 0;
+let gameScore = 0;
+
+// 🎯 Update game gesture in real-time
+setInterval(() => {
+    if (gameRunning) {
+        fetch('/get-gesture')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("game-gesture").innerText = data.gesture;
+        })
+        .catch(err => console.error("Error:", err));
+    }
+}, 300);
+
+// ⏱️ Update game timer
+setInterval(() => {
+    if (gameRunning && gameStartTime > 0) {
+        let elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+        document.getElementById("game-time").innerText = elapsed + "s";
+    }
+}, 1000);
+
+// ▶️ Start Game
+function startGame() {
+    const mode = document.getElementById("game-mode").value;
+    const startBtn = document.getElementById("start-game-btn");
+    const stopBtn = document.getElementById("stop-game-btn");
+
+    startBtn.disabled = true;
+    document.getElementById("game-status").className = "status loading";
+    document.getElementById("game-status").innerText = "● Loading...";
+
+    fetch("/start-game", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: mode })
+    })
+    .then(res => res.json())
+    .then(data => {
+        gameRunning = true;
+        gameStartTime = Date.now();
+        gameScore = 0;
+        
+        document.getElementById("game-gesture").innerText = "None";
+        document.getElementById("game-score").innerText = "0";
+        document.getElementById("game-time").innerText = "0s";
+        
+        document.getElementById("game-status").className = "status running";
+        document.getElementById("game-status").innerText = "● Running";
+        
+        stopBtn.disabled = false;
+        
+        // Show instructions
+        document.getElementById("game-instructions-panel").style.display = "block";
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        document.getElementById("game-status").className = "status stopped";
+        document.getElementById("game-status").innerText = "● Error";
+        startBtn.disabled = false;
+    });
+}
+
+// 🛑 Stop Game
+function stopGame() {
+    const startBtn = document.getElementById("start-game-btn");
+    const stopBtn = document.getElementById("stop-game-btn");
+
+    stopBtn.disabled = true;
+    document.getElementById("game-status").className = "status loading";
+    document.getElementById("game-status").innerText = "● Stopping...";
+
+    fetch("/stop-game", { method: "POST" })
+    .then(res => res.json())
+    .then(data => {
+        gameRunning = false;
+        gameStartTime = 0;
+        
+        document.getElementById("game-gesture").innerText = "None";
+        document.getElementById("game-status").className = "status stopped";
+        document.getElementById("game-status").innerText = "● Stopped";
+        
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        stopBtn.disabled = false;
+    });
+}
+
+// Close instructions when starting
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize button states
+    document.getElementById("stop-game-btn").disabled = true;
+});
+</script>
+
 {% endblock %}

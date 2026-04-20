@@ -56,8 +56,36 @@ button {
     cursor: pointer;
 }
 
-.start { background: #22c55e; }
-.stop { background: #ef4444; }
+.start { background: #22c55e; color: white; }
+.stop { background: #ef4444; color: white; }
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: white;
+}
+
+.btn.primary:hover {
+    opacity: 0.9;
+}
+
+.btn.secondary {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.btn.secondary:hover {
+    opacity: 0.9;
+}
 
 /* Footer */
 footer {
@@ -66,6 +94,33 @@ footer {
     padding: 15px;
     margin-top: 50px;
 }
+
+/* Grid layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* Status styling */
+.status {
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.status.running {
+    background: #143d14;
+    color: #86efac;
+}
+
+.status.stopped {
+    background: #7f1d1d;
+    color: #fca5a5;
+}
+
 /* 🎤 Pulsing mic effect */
 #voice-indicator {
     animation: pulse 1.5s infinite;
@@ -86,9 +141,18 @@ footer {
     <div class="logo">AI Control System</div>
     <nav>
         <a href="/">Home</a>
-        <a href="/gesture">Gesture Mouse</a>
-        <a href="/game">Game Control</a>
-        <a href="/voice">Voice Control</a>
+        {% if current_user.is_authenticated %}
+            <a href="/gesture">Gesture Mouse</a>
+            <a href="/game">Game Control</a>
+            <a href="/voice">Voice Control</a>
+            {% if current_user.is_admin() %}
+                <a href="/admin">👑 Admin</a>
+            {% endif %}
+            <a href="/logout">Logout ({{ current_user.username }})</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
     </nav>
 </header>
 

@@ -66,8 +66,28 @@
 
 </div>
 
+<!-- 💬 Chat/Response Panel -->
+<div style="margin-top:40px; max-width:700px; margin-left:auto; margin-right:auto;">
+    <div class="card" style="width:100%; min-height:300px;">
+        <h3 style="margin-bottom:15px;">📝 Conversation</h3>
+        <div id="chat-box" style="height:250px; overflow-y:auto; padding:15px; background:#0f172a; border-radius:8px; border:1px solid #334155;">
+            <p style="color:#94a3b8; text-align:center;">Conversation will appear here...</p>
+        </div>
+    </div>
+</div>
+
 <!-- ⚡ Script -->
 <script>
+// 🔊 Text-to-speech function
+function speak(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
 function startVoiceUI() {
 
     const status = document.getElementById("voice-status");
@@ -128,5 +148,29 @@ function updateChat() {
 // Refresh every second
 setInterval(updateChat, 1000);
 </script>
+
+<style>
+.message {
+    padding: 10px 15px;
+    margin: 8px 0;
+    border-radius: 8px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.message.user {
+    background: #22c55e;
+    color: white;
+    margin-left: 20px;
+    text-align: right;
+}
+
+.message.bot {
+    background: #38bdf8;
+    color: white;
+    margin-right: 20px;
+    text-align: left;
+}
+</style>
 
 {% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.admin-header {
+    margin-bottom: 30px;
+}
+
+.admin-header h1 {
+    font-size: 32px;
+    margin: 0 0 10px 0;
+}
+
+.admin-header p {
+    color: #94a3b8;
+    margin: 0;
+}
+
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e293b;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.logs-table thead {
+    background: #0f172a;
+}
+
+.logs-table th {
+    padding: 15px;
+    text-align: left;
+    color: #94a3b8;
+    font-weight: bold;
+    border-bottom: 1px solid #334155;
+}
+
+.logs-table td {
+    padding: 15px;
+    border-bottom: 1px solid #334155;
+    font-size: 13px;
+}
+
+.logs-table tr:hover {
+    background: #0f172a;
+}
+
+.action-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.action-gesture {
+    background: #4c1d95;
+    color: #e9d5ff;
+}
+
+.action-voice {
+    background: #1e3a8a;
+    color: #93c5fd;
+}
+
+.action-admin {
+    background: #7f1d1d;
+    color: #fca5a5;
+}
+
+.action-other {
+    background: #334155;
+    color: #cbd5e1;
+}
+
+.timestamp {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+    padding: 10px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: white;
+}
+
+.filters button {
+    padding: 10px 20px;
+    background: #38bdf8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.filters button:hover {
+    background: #0ea5e9;
+}
+</style>
+
+<div class="admin-header">
+    <h1>📝 Activity Logs</h1>
+    <p>View all user activities and system events</p>
+</div>
+
+<div class="filters">
+    <form method="GET" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <input type="text" name="search" placeholder="Search username..." value="{{ search or '' }}">
+        <select name="action_filter">
+            <option value="">All Actions</option>
+            <option value="start_gesture" {% if action_filter == 'start_gesture' %}selected{% endif %}>Start Gesture</option>
+            <option value="stop_gesture" {% if action_filter == 'stop_gesture' %}selected{% endif %}>Stop Gesture</option>
+            <option value="start_voice" {% if action_filter == 'start_voice' %}selected{% endif %}>Start Voice</option>
+            <option value="stop_voice" {% if action_filter == 'stop_voice' %}selected{% endif %}>Stop Voice</option>
+        </select>
+        <button type="submit">🔍 Filter</button>
+        <a href="/admin/logs" style="padding: 10px 20px; background: #334155; color: white; text-decoration: none; border-radius: 6px;">Reset</a>
+    </form>
+</div>
+
+{% if logs %}
+    <table class="logs-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.user.username }}</td>
+                    <td>
+                        {% if 'gesture' in log.action %}
+                            <span class="action-badge action-gesture">{{ log.action }}</span>
+                        {% elif 'voice' in log.action %}
+                            <span class="action-badge action-voice">{{ log.action }}</span>
+                        {% elif 'admin' in log.action or 'user' in log.action %}
+                            <span class="action-badge action-admin">{{ log.action }}</span>
+                        {% else %}
+                            <span class="action-badge action-other">{{ log.action }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: #cbd5e1; max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                        {{ log.details or '-' }}
+                    </td>
+                    <td class="timestamp">
+                        {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="empty-state">
+        <p>No activity logs found.</p>
+    </div>
+{% endif %}
+
+{% endblock %}

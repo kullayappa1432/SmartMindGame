@@ -15,144 +15,316 @@
     <!-- 🎥 Camera Section -->
     <div class="card" style="width:420px;">
 
-        <h3 style="margin-bottom:15px;">Live Camera</h3>
+        <h3 style="margin-bottom:15px;">Live Camera Feed</h3>
 
         <!-- Camera Box -->
-       <div style="position:relative;">
-<img id="video-stream" src="" style="width:100%; border-radius:10px;">
-    <div id="gesture-label"
-         style="position:absolute; top:10px; right:10px;
-                background:rgba(0,0,0,0.7);
-                padding:8px; border-radius:8px;">
-        ✋ None
-    </div>
-</div>
+        <div style="position:relative; background:rgba(0,0,0,0.3); border-radius:10px; overflow:hidden;">
+            <img id="video-stream" src="" style="width:100%; border-radius:10px; display:none;">
+            
+            <!-- Placeholder when not running -->
+            <div id="camera-placeholder" style="width:100%; height:300px; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); display:flex; align-items:center; justify-content:center; border-radius:10px;">
+                <div style="text-align:center; color:#64748b;">
+                    <div style="font-size:40px; margin-bottom:10px;">📷</div>
+                    <p>Click Start to begin gesture recognition</p>
+                </div>
+            </div>
+
+            <!-- Gesture Display -->
+            <div id="gesture-label"
+                 style="position:absolute; top:10px; right:10px;
+                        background:rgba(0,0,0,0.8);
+                        padding:10px 15px; border-radius:8px;
+                        font-size:16px; font-weight:bold;
+                        display:none;">
+                ✋ Detecting...
+            </div>
+        </div>
 
         <!-- Status -->
-        <div id="gesture-status" class="status stopped" style="margin-top:10px;">
+        <div id="gesture-status" class="status stopped" style="margin-top:10px; text-align:center; font-weight:bold;">
             ● Stopped
         </div>
 
     </div>
 
     <!-- ⚙️ Control Panel -->
-    <div class="card" style="width:320px;">
+    <div class="card" style="width:350px;">
 
-        <h3 style="margin-bottom:20px;">Control Panel</h3>
-
-        <p style="color:#94a3b8;">
-            Start or stop gesture recognition system.
-        </p>
+        <h3 style="margin-bottom:20px;">🎮 Control Panel</h3>
 
         <!-- Buttons -->
-        <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
-
-            <button class="btn primary" onclick="startSystem('gesture')">
-                ▶ Start
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+            <button class="btn primary" id="start-btn" onclick="startSystem('gesture')">
+                ▶ Start System
             </button>
-
-            <button class="btn secondary" onclick="stopSystem('gesture')">
-                ■ Stop
+            <button class="btn secondary" id="stop-btn" onclick="stopSystem('gesture')" disabled>
+                ■ Stop System
             </button>
-
         </div>
 
-        <!-- Info -->
-        <div style="margin-top:20px; font-size:14px; color:#64748b;">
-            <p>✔ Move mouse using gestures</p>
-            <p>✔ AI-based tracking</p>
-            <p>✔ Real-time response</p>
+        <!-- Quick Stats -->
+        <div style="background:rgba(34,197,94,0.1); padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid #22c55e;">
+            <p style="color:#94a3b8; margin:0 0 5px 0; font-size:12px;">CURRENT GESTURE</p>
+            <p id="gesture-display" style="color:#22c55e; margin:0; font-size:18px; font-weight:bold;">None</p>
         </div>
+
+        <!-- Help Link -->
+        <button onclick="toggleInstructions()" style="width:100%; padding:10px; background:rgba(59,130,246,0.2); border:1px solid #3b82f6; color:#3b82f6; border-radius:8px; cursor:pointer; font-weight:600; margin-bottom:10px;">
+            📖 Show Instructions
+        </button>
 
     </div>
 
 </div>
 
+<!-- 📋 Instructions Panel (Hidden by default) -->
+<div id="instructions-panel" style="display:none; margin-top:30px;">
+    <div class="card" style="background:rgba(59,130,246,0.05); border:2px solid #3b82f6;">
+        
+        <h2 style="color:#3b82f6; margin-bottom:20px;">📖 How to Use Gesture Control</h2>
+
+        <!-- Setup Steps -->
+        <div style="margin-bottom:25px;">
+            <h4 style="color:#94a3b8; margin-bottom:10px;">🔧 Setup Instructions:</h4>
+            <ol style="color:#cbd5e1; line-height:1.8;">
+                <li><strong>Position:</strong> Sit about 50cm (20 inches) away from your camera</li>
+                <li><strong>Lighting:</strong> Ensure good lighting on your face and hands</li>
+                <li><strong>Space:</strong> Keep hands within the blue ROI box on camera feed</li>
+                <li><strong>Start:</strong> Click the "Start System" button to begin</li>
+            </ol>
+        </div>
+
+        <!-- Gesture Guide -->
+        <div style="margin-bottom:25px;">
+            <h4 style="color:#94a3b8; margin-bottom:15px;">✋ Gesture Guide:</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                
+                <!-- Gesture 1 -->
+                <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #22c55e;">
+                    <p style="color:#22c55e; font-weight:bold; margin:0 0 5px 0;">👋 OPEN HAND</p>
+                    <p style="color:#94a3b8; font-size:13px; margin:0;">Move cursor smoothly across screen</p>
+                </div>
+
+                <!-- Gesture 2 -->
+                <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #f59e0b;">
+                    <p style="color:#f59e0b; font-weight:bold; margin:0 0 5px 0;">✊ FIST</p>
+                    <p style="color:#94a3b8; font-size:13px; margin:0;">Left click on screen</p>
+                </div>
+
+                <!-- Gesture 3 -->
+                <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #ef4444;">
+                    <p style="color:#ef4444; font-weight:bold; margin:0 0 5px 0;">✌️ TWO FINGERS</p>
+                    <p style="color:#94a3b8; font-size:13px; margin:0;">Right click on screen</p>
+                </div>
+
+                <!-- Gesture 4 -->
+                <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #8b5cf6;">
+                    <p style="color:#8b5cf6; font-weight:bold; margin:0 0 5px 0;">🤟 THREE FINGERS</p>
+                    <p style="color:#94a3b8; font-size:13px; margin:0;">Double click on screen</p>
+                </div>
+
+                <!-- Gesture 5 -->
+                <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #06b6d4;">
+                    <p style="color:#06b6d4; font-weight:bold; margin:0 0 5px 0;">← SWIPE LEFT</p>
+                    <p style="color:#94a3b8; font-size:13px; margin:0;">Scroll up on page</p>
+                </div>
+
+                <!-- Gesture 6 -->
+                <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border-left:3px solid #ec4899;">
+                    <p style="color:#ec4899; font-weight:bold; margin:0 0 5px 0;">→ SWIPE RIGHT</p>
+                    <p style="color:#94a3b8; font-size:13px; margin:0;">Scroll down on page</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div style="background:rgba(34,197,94,0.1); padding:15px; border-radius:8px; border-left:4px solid #22c55e;">
+            <h4 style="color:#22c55e; margin-top:0;">💡 Pro Tips:</h4>
+            <ul style="color:#cbd5e1; margin:10px 0 0 0; padding-left:20px;">
+                <li>Keep gestures clear and distinct</li>
+                <li>Avoid sudden movements for better tracking</li>
+                <li>Ensure hand contrast against background</li>
+                <li>Restart system if detection becomes unstable</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
 <style>
     /* 🔹 Status styling */
-.status {
-    margin-top: 10px;
-    font-size: 14px;
-}
+    .status {
+        margin-top: 10px;
+        font-size: 14px;
+        padding: 8px;
+        border-radius: 8px;
+    }
 
-.running { color: #22c55e; }
-.loading { color: #facc15; }
-.stopped { color: #ef4444; }
+    .running { 
+        color: #22c55e;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    
+    .loading { 
+        color: #facc15;
+        background: rgba(250, 204, 21, 0.1);
+        border: 1px solid rgba(250, 204, 21, 0.3);
+    }
+    
+    .stopped { 
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
 
-/* 📦 Card polish */
-.card {
-    background: rgba(30,41,59,0.7);
-    padding: 25px;
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.08);
-    transition: 0.3s;
-}
+    /* 📦 Card polish */
+    .card {
+        background: rgba(30,41,59,0.7);
+        padding: 25px;
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.08);
+        transition: 0.3s;
+    }
 
-.card:hover {
-    transform: translateY(-6px);
-}
+    .card:hover {
+        transform: translateY(-6px);
+    }
 
-/* 🔘 Buttons */
-.btn {
-    padding: 12px 20px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-}
+    /* 🔘 Buttons */
+    .btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
 
-.primary {
-    background: linear-gradient(90deg,#22c55e,#4ade80);
-    color: black;
-}
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-.secondary {
-    background: linear-gradient(90deg,#ef4444,#f87171);
-    color: white;
-}
+    .primary {
+        background: linear-gradient(90deg,#22c55e,#4ade80);
+        color: black;
+    }
+
+    .primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+    }
+
+    .secondary {
+        background: linear-gradient(90deg,#ef4444,#f87171);
+        color: white;
+    }
+
+    .secondary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+    }
 </style>
 
 <script>
+// 🎬 Real-time gesture update
 setInterval(()=>{
- fetch('/get-gesture')
- .then(res=>res.json())
- .then(data=>{
-   document.getElementById("gesture-label").innerText = data.gesture;
- })
- .catch(()=>{
-   document.getElementById("gesture-label").innerText = "Error";
- })
-},500);
-</script>
+    if (document.getElementById("video-stream").src) {
+        fetch('/get-gesture')
+        .then(res => res.json())
+        .then(data => {
+            const gestureLabel = document.getElementById("gesture-label");
+            const gestureDisplay = document.getElementById("gesture-display");
+            gestureLabel.innerText = data.gesture;
+            gestureDisplay.innerText = data.gesture;
+        })
+        .catch(err => {
+            console.error("Error fetching gesture:", err);
+        });
+    }
+}, 300);
 
-<script>
-let gestureRunning = false;
+// 🎯 Toggle instructions panel
+function toggleInstructions() {
+    const panel = document.getElementById("instructions-panel");
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+}
 
+// ▶️ Start System
 function startSystem(type) {
     if (type === "gesture") {
+        const startBtn = document.getElementById("start-btn");
+        const stopBtn = document.getElementById("stop-btn");
+        
+        // Show loading state
+        startBtn.disabled = true;
+        document.getElementById("gesture-status").className = "status loading";
+        document.getElementById("gesture-status").innerText = "● Initializing...";
+
         fetch("/start-gesture")
-        .then(() => {
+        .then(res => res.json())
+        .then(data => {
+            // Update UI
+            document.getElementById("camera-placeholder").style.display = "none";
+            document.getElementById("video-stream").style.display = "block";
+            document.getElementById("gesture-label").style.display = "block";
+            document.getElementById("video-stream").src = "/video_feed";
+            
             document.getElementById("gesture-status").innerText = "● Running";
             document.getElementById("gesture-status").className = "status running";
-
-            // 🔥 reload video after starting
-document.getElementById("video-stream").src = "/video_feed";        });
-    }
-}
-function stopSystem(type) {
-    if (type === "gesture") {
-
-        fetch("/stop-gesture")
-        .then(() => {
-            document.getElementById("gesture-status").innerText = "● Stopped";
+            
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            
+            // Show instructions automatically
+            document.getElementById("instructions-panel").style.display = "block";
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            document.getElementById("gesture-status").innerText = "● Error";
             document.getElementById("gesture-status").className = "status stopped";
-
-            document.getElementById("video-stream").src = "";
+            startBtn.disabled = false;
         });
     }
 }
 
+// 🛑 Stop System
+function stopSystem(type) {
+    if (type === "gesture") {
+        const startBtn = document.getElementById("start-btn");
+        const stopBtn = document.getElementById("stop-btn");
+        
+        stopBtn.disabled = true;
+        document.getElementById("gesture-status").className = "status loading";
+        document.getElementById("gesture-status").innerText = "● Stopping...";
+
+        fetch("/stop-gesture")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("video-stream").src = "";
+            document.getElementById("video-stream").style.display = "none";
+            document.getElementById("gesture-label").style.display = "none";
+            document.getElementById("camera-placeholder").style.display = "flex";
+            document.getElementById("gesture-label").innerText = "✋ Detecting...";
+            document.getElementById("gesture-display").innerText = "None";
+            
+            document.getElementById("gesture-status").innerText = "● Stopped";
+            document.getElementById("gesture-status").className = "status stopped";
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            document.getElementById("gesture-status").innerText = "● Error";
+            document.getElementById("gesture-status").className = "status stopped";
+            stopBtn.disabled = false;
+        });
+    }
+}
 </script>
 
 {% endblock %}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.admin-header {
+    margin-bottom: 30px;
+}
+
+.admin-header h1 {
+    font-size: 32px;
+    margin: 0 0 10px 0;
+}
+
+.admin-header p {
+    color: #94a3b8;
+    margin: 0;
+}
+
+.settings-container {
+    max-width: 600px;
+    margin-top: 30px;
+}
+
+.setting-item {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #334155;
+}
+
+.setting-item h3 {
+    margin: 0 0 10px 0;
+    color: #f1f5f9;
+}
+
+.setting-item p {
+    margin: 0 0 15px 0;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.setting-item input,
+.setting-item select {
+    width: 100%;
+    padding: 10px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: white;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.setting-item input:focus,
+.setting-item select:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.1);
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-save:hover {
+    opacity: 0.9;
+}
+
+.btn-reset {
+    background: #334155;
+    color: #cbd5e1;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-reset:hover {
+    background: #475569;
+}
+
+.alert {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: #143d14;
+    color: #86efac;
+    border-left: 4px solid #22c55e;
+}
+
+.alert-danger {
+    background: #7f1d1d;
+    color: #fca5a5;
+    border-left: 4px solid #ef4444;
+}
+</style>
+
+<div class="admin-header">
+    <h1>⚙️ System Settings</h1>
+    <p>Configure system parameters and features</p>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="settings-container">
+    <form method="POST">
+        <div class="setting-item">
+            <h3>🎮 Gesture Detection</h3>
+            <p>Sensitivity level for gesture recognition (1-10)</p>
+            <input type="number" name="gesture_sensitivity" min="1" max="10"
+                   value="{{ settings.get('gesture_sensitivity', 5) }}" required>
+        </div>
+
+        <div class="setting-item">
+            <h3>🎤 Voice Recognition</h3>
+            <p>Timeout for voice commands in seconds</p>
+            <input type="number" name="voice_timeout" min="5" max="30"
+                   value="{{ settings.get('voice_timeout', 5) }}" required>
+        </div>
+
+        <div class="setting-item">
+            <h3>🎥 Video Feed</h3>
+            <p>Frames per second for video streaming</p>
+            <input type="number" name="video_fps" min="10" max="60"
+                   value="{{ settings.get('video_fps', 30) }}" required>
+        </div>
+
+        <div class="setting-item">
+            <h3>🔒 Debug Mode</h3>
+            <p>Enable/disable debug logging</p>
+            <select name="debug_mode">
+                <option value="false" {% if settings.get('debug_mode') == 'false' %}selected{% endif %}>Disabled</option>
+                <option value="true" {% if settings.get('debug_mode') == 'true' %}selected{% endif %}>Enabled</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn-save">💾 Save Settings</button>
+            <button type="reset" class="btn-reset">↺ Reset</button>
+        </div>
+    </form>
+
+    <div style="margin-top: 40px; padding: 20px; background: #0f172a; border-radius: 10px; border-left: 4px solid #38bdf8;">
+        <h3 style="margin-top: 0;">ℹ️ Information</h3>
+        <p style="color: #94a3b8; margin: 0;">
+            These settings control how the AI control system behaves. Changes take effect immediately.
+        </p>
+    </div>
+</div>
+
+{% endblock %}

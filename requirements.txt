@@ -5,3 +5,7 @@ mediapipe
 pyautogui
 SpeechRecognition
 pyaudio
+flask-sqlalchemy
+flask-login
+werkzeug
+python-dotenv
