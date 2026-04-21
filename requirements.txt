@@ -9,3 +9,5 @@ flask-sqlalchemy
 flask-login
 werkzeug
 python-dotenv
+Flask-Mail
+email-validator

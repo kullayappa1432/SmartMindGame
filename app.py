@@ -21,6 +21,7 @@ from modules.gesture.gesture_mouse import (
 # Database & Auth imports
 from models import db, User, Config, ActivityLog
 from auth import auth_bp
+from email_utils import mail
 from routes.game_routes import game_bp
 from utils import admin_required, log_activity, get_system_stats, toggle_user_role, delete_user
 
@@ -33,10 +34,19 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///smartmind.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# 📧 Email Configuration
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', True)
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@smartmindgame.com')
+
 # =========================
 # 📦 INITIALIZE EXTENSIONS
 # =========================
 db.init_app(app)
+mail.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login'
