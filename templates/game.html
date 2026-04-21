@@ -67,10 +67,10 @@
 
         <!-- Control Buttons -->
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
-            <button class="btn primary" id="start-game-btn" onclick="startGame()">
+            <button class="btn primary" id="start-game-btn" onclick="startSystem('game')" data-tooltip="Start gesture-based game control">
                 ▶ Start Game
             </button>
-            <button class="btn secondary" id="stop-game-btn" onclick="stopGame()" disabled>
+            <button class="btn secondary" id="stop-game-btn" onclick="stopSystem('game')" disabled data-tooltip="Stop the game session">
                 ■ Stop Game
             </button>
         </div>

@@ -54,10 +54,10 @@
 
         <!-- Buttons -->
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
-            <button class="btn primary" id="start-btn" onclick="startSystem('gesture')">
+            <button class="btn primary" id="start-btn" onclick="startSystem('gesture')" data-tooltip="Enable camera and hand gesture recognition">
                 ▶ Start System
             </button>
-            <button class="btn secondary" id="stop-btn" onclick="stopSystem('gesture')" disabled>
+            <button class="btn secondary" id="stop-btn" onclick="stopSystem('gesture')" disabled data-tooltip="Disable camera and stop gesture tracking">
                 ■ Stop System
             </button>
         </div>
@@ -69,7 +69,7 @@
         </div>
 
         <!-- Help Link -->
-        <button onclick="toggleInstructions()" style="width:100%; padding:10px; background:rgba(59,130,246,0.2); border:1px solid #3b82f6; color:#3b82f6; border-radius:8px; cursor:pointer; font-weight:600; margin-bottom:10px;">
+        <button onclick="toggleInstructions()" style="width:100%; padding:10px; background:rgba(59,130,246,0.2); border:1px solid #3b82f6; color:#3b82f6; border-radius:8px; cursor:pointer; font-weight:600; margin-bottom:10px; transition:all 0.3s;" data-tooltip="Learn how to use gesture control">
             📖 Show Instructions
         </button>
 

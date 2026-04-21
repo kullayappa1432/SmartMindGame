@@ -77,10 +77,39 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
         }
 
-        button:hover {
-            opacity: 0.9;
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        button.loading::after {
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin-left: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .login-link {
@@ -123,9 +152,70 @@
             color: #94a3b8;
             margin-top: 4px;
         }
+
+        /* 📢 AD SYSTEM */
+        .ad-container {
+            position: fixed;
+            background: rgba(2, 6, 23, 0.95);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .ad-banner-top {
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            height: 100px;
+        }
+
+        .ad-banner-bottom {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 728px;
+            height: 90px;
+        }
+
+        .ad-close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 101;
+        }
+
+        .ad-close-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
+
+<!-- Top Banner Ad -->
+<div id="ad-banner-top" class="ad-container ad-banner-top">
+    <button class="ad-close-btn" onclick="closeAd('banner-top')">×</button>
+</div>
 
 <div class="register-container">
     <div class="logo">🤖 AI Control System</div>
@@ -163,13 +253,104 @@
             <input type="password" id="password_confirm" name="password_confirm" required>
         </div>
 
-        <button type="submit">✨ Create Account</button>
+        <button type="submit" data-tooltip="Create your account">✨ Create Account</button>
     </form>
 
     <div class="login-link">
         Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
     </div>
 </div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.classList.add('loading');
+        btn.disabled = true;
+    });
+</script>
+
+<!-- Bottom Banner Ad -->
+<div id="ad-banner-bottom" class="ad-container ad-banner-bottom">
+    <button class="ad-close-btn" onclick="closeAd('banner-bottom')">×</button>
+</div>
+
+<script>
+// Ad Manager for handling ad state
+class AdManager {
+    constructor() {
+        this.ads = {
+            'banner-top': { visible: true, closed: false },
+            'banner-bottom': { visible: true, closed: false }
+        };
+        this.initializeAds();
+    }
+
+    initializeAds() {
+        const savedState = localStorage.getItem('adState');
+        if (savedState) {
+            this.ads = JSON.parse(savedState);
+            this.applyAdState();
+        }
+        this.loadAds();
+    }
+
+    loadAds() {
+        this.loadAd('banner-top', { type: 'banner', size: '1200×100', position: 'top' });
+        this.loadAd('banner-bottom', { type: 'banner', size: '728×90', position: 'bottom' });
+    }
+
+    loadAd(adId, config) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (!adElement) return;
+        if (!this.ads[adId].visible || this.ads[adId].closed) {
+            adElement.style.display = 'none';
+            return;
+        }
+        adElement.setAttribute('data-ad-size', config.size);
+        adElement.setAttribute('data-ad-position', config.position);
+        adElement.classList.add('ad-loading');
+        setTimeout(() => {
+            adElement.classList.remove('ad-loading');
+            this.trackAdImpression(adId);
+        }, 300);
+    }
+
+    closeAd(adId) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (!adElement) return;
+        adElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        adElement.style.opacity = '0';
+        adElement.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            adElement.style.display = 'none';
+            this.ads[adId].closed = true;
+            this.saveAdState();
+            this.trackAdClose(adId);
+        }, 300);
+    }
+
+    saveAdState() {
+        localStorage.setItem('adState', JSON.stringify(this.ads));
+    }
+
+    applyAdState() {
+        Object.keys(this.ads).forEach(adId => {
+            if (this.ads[adId].closed) {
+                const adElement = document.getElementById(`ad-${adId}`);
+                if (adElement) adElement.style.display = 'none';
+            }
+        });
+    }
+
+    trackAdImpression(adId) { console.log(`Ad impression tracked: ${adId}`); }
+    trackAdClose(adId) { console.log(`Ad closed: ${adId}`); }
+    trackAdClick(adId) { console.log(`Ad clicked: ${adId}`); }
+}
+
+const adManager = new AdManager();
+function closeAd(adId) { adManager.closeAd(adId); }
+window.addEventListener('beforeunload', () => adManager.saveAdState());
+</script>
 
 </body>
 </html>

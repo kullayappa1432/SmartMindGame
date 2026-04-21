@@ -132,8 +132,8 @@
             <option value="start_voice" {% if action_filter == 'start_voice' %}selected{% endif %}>Start Voice</option>
             <option value="stop_voice" {% if action_filter == 'stop_voice' %}selected{% endif %}>Stop Voice</option>
         </select>
-        <button type="submit">🔍 Filter</button>
-        <a href="/admin/logs" style="padding: 10px 20px; background: #334155; color: white; text-decoration: none; border-radius: 6px;">Reset</a>
+        <button type="submit" data-tooltip="Filter logs by selected criteria">🔍 Filter</button>
+        <a href="/admin/logs" style="padding: 10px 20px; background: #334155; color: white; text-decoration: none; border-radius: 6px; transition: all 0.3s;" data-tooltip="Clear all filters" onmouseover="this.style.background='#475569'" onmouseout="this.style.background='#334155'">Reset</a>
     </form>
 </div>
 

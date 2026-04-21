@@ -48,43 +48,190 @@ img {
     width: 120px;
 }
 
+/* 🔘 Base Button Styles */
 button {
     padding: 10px 20px;
     margin: 10px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    font-family: inherit;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: scale(1);
 }
 
 .start { background: #22c55e; color: white; }
 .stop { background: #ef4444; color: white; }
 
+/* 🎨 Enhanced Button Styles */
 .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     text-decoration: none;
     display: inline-block;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn.primary {
     background: linear-gradient(135deg, #38bdf8, #22c55e);
     color: white;
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
 }
 
-.btn.primary:hover {
-    opacity: 0.9;
+.btn.primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+}
+
+.btn.primary:active:not(:disabled) {
+    transform: translateY(0);
 }
 
 .btn.secondary {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
-.btn.secondary:hover {
-    opacity: 0.9;
+.btn.secondary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+.btn.secondary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* 🔘 Button States */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: scale(1);
+    box-shadow: none;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* ⏳ Loading State */
+.btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn.loading::after {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-left: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ✅ Success State */
+.btn.success {
+    background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.btn.success::after {
+    content: ' ✓';
+}
+
+/* ❌ Error State */
+.btn.error {
+    background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* 💡 Tooltip Styles */
+.btn[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: #0f172a;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.btn[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: #0f172a;
+    border-right: 1px solid #334155;
+    border-bottom: 1px solid #334155;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.btn[data-tooltip]:hover::after,
+.btn[data-tooltip]:hover::before {
+    opacity: 1;
 }
 
 /* Footer */
@@ -93,6 +240,189 @@ footer {
     text-align: center;
     padding: 15px;
     margin-top: 50px;
+}
+
+/* 📢 AD SYSTEM */
+.ad-container {
+    position: fixed;
+    background: rgba(2, 6, 23, 0.95);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* Top Banner Ad */
+.ad-banner-top {
+    top: 65px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1200px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.ad-banner-top.minimal {
+    height: 60px;
+}
+
+/* Bottom Banner Ad */
+.ad-banner-bottom {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 728px;
+    height: 90px;
+}
+
+.ad-banner-bottom.minimal {
+    height: 60px;
+}
+
+/* Left Sidebar Ad */
+.ad-sidebar-left {
+    left: 15px;
+    top: 200px;
+    width: 160px;
+    height: 600px;
+    flex-direction: column;
+}
+
+.ad-sidebar-left.minimal {
+    width: 120px;
+    height: 400px;
+}
+
+/* Right Sidebar Ad */
+.ad-sidebar-right {
+    right: 15px;
+    top: 200px;
+    width: 160px;
+    height: 600px;
+    flex-direction: column;
+}
+
+.ad-sidebar-right.minimal {
+    width: 120px;
+    height: 400px;
+}
+
+/* Ad Close Button */
+.ad-close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 101;
+}
+
+.ad-close-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+/* Main Content Area Adjustment */
+body {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* When sidebars are visible, adjust main content */
+body.ads-enabled {
+    grid-template-columns: 180px 1fr 180px;
+}
+
+body.ads-enabled .ad-wrapper {
+    grid-column: 1 / -1;
+}
+
+/* Responsive Ads */
+@media (max-width: 1400px) {
+    .ad-sidebar-left,
+    .ad-sidebar-right {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    .ad-banner-top {
+        height: 80px;
+        top: 65px;
+    }
+    
+    .ad-banner-bottom {
+        height: 70px;
+        width: 95%;
+    }
+    
+}
+
+@media (max-width: 1024px) {
+    .ad-sidebar-left,
+    .ad-sidebar-right {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .ad-banner-top {
+        height: 60px;
+        top: 60px;
+    }
+    
+    .ad-banner-bottom {
+        height: 50px;
+        width: 100%;
+        bottom: 10px;
+    }
+    
+    .ad-sidebar-left,
+    .ad-sidebar-right {
+        display: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .ad-banner-top,
+    .ad-banner-bottom {
+        display: none !important;
+    }
+}
+
+/* Ad Loading State */
+.ad-loading {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes adPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Ad Tracking */
+.ad-track-click {
+    cursor: pointer;
+}
+
+.ad-track-click:hover .ad-placeholder {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(34, 197, 94, 0.1));
 }
 
 /* Grid layout */
@@ -131,6 +461,203 @@ footer {
     50% { transform: scale(1.5); opacity: 0.5; }
     100% { transform: scale(1); opacity: 1; }
 }
+
+/* 🔔 Toast Notification System */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+}
+
+.toast {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+}
+
+.toast.success {
+    border-left-color: #22c55e;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+    color: #86efac;
+}
+
+.toast.error {
+    border-left-color: #ef4444;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+    color: #fca5a5;
+}
+
+.toast.warning {
+    border-left-color: #f59e0b;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+    color: #fcd34d;
+}
+
+.toast.info {
+    border-left-color: #3b82f6;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+    color: #93c5fd;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+.toast.fadeOut {
+    animation: slideOut 0.3s ease;
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.toast-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    transition: opacity 0.2s;
+}
+
+.toast-close:hover {
+    opacity: 0.7;
+}
+
+/* 🗨️ Confirmation Dialog */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background: #1e293b;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    padding: 24px;
+    max-width: 400px;
+    animation: zoomIn 0.3s ease;
+    border: 1px solid #334155;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    margin-bottom: 16px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 0;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-footer .btn {
+    margin: 0;
+}
+
+/* 📋 Progress Indicator */
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(56, 189, 248, 0.3);
+    border-top-color: #38bdf8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.progress-text {
+    color: #cbd5e1;
+    font-size: 14px;
+    font-weight: 500;
+}
 </style>
 
 </head>
@@ -160,20 +687,548 @@ footer {
     {% block content %}{% endblock %}
 </div>
 
+<!-- 📢 ADVERTISEMENT SECTIONS -->
+<!-- Top Banner Ad -->
+<div id="ad-banner-top" class="ad-container ad-banner-top">
+    <button class="ad-close-btn" onclick="closeAd('banner-top')">×</button>
+</div>
+
+<!-- Left Sidebar Ad -->
+<div id="ad-sidebar-left" class="ad-container ad-sidebar-left">
+    <button class="ad-close-btn" onclick="closeAd('sidebar-left')">×</button>
+</div>
+
+<!-- Right Sidebar Ad -->
+<div id="ad-sidebar-right" class="ad-container ad-sidebar-right">
+    <button class="ad-close-btn" onclick="closeAd('sidebar-right')">×</button>
+</div>
+
+<!-- Bottom Banner Ad -->
+<div id="ad-banner-bottom" class="ad-container ad-banner-bottom">
+    <button class="ad-close-btn" onclick="closeAd('banner-bottom')">×</button>
+</div>
+
 <footer>
     <p>© 2026 AI Control System</p>
 </footer>
 
 <script>
+// ==================== NOTIFICATION SYSTEM ====================
+class NotificationManager {
+    constructor() {
+        this.container = null;
+        this.initContainer();
+    }
+
+    initContainer() {
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.className = 'toast-container';
+            document.body.appendChild(this.container);
+        }
+    }
+
+    show(message, type = 'info', duration = 4000) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = {
+            success: '✓',
+            error: '✕',
+            warning: '⚠',
+            info: 'ℹ'
+        };
+        
+        toast.innerHTML = `
+            <div class="toast-icon">${icons[type]}</div>
+            <div>${message}</div>
+            <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+        `;
+        
+        this.container.appendChild(toast);
+        
+        if (duration > 0) {
+            setTimeout(() => {
+                toast.classList.add('fadeOut');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        
+        return toast;
+    }
+
+    success(message, duration) { return this.show(message, 'success', duration); }
+    error(message, duration) { return this.show(message, 'error', duration); }
+    warning(message, duration) { return this.show(message, 'warning', duration); }
+    info(message, duration) { return this.show(message, 'info', duration); }
+}
+
+// Global notification instance
+const notify = new NotificationManager();
+
+// ==================== CONFIRMATION DIALOG ====================
+class ConfirmDialog {
+    static async show(title, message, confirmText = 'Confirm', cancelText = 'Cancel') {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay show';
+            
+            overlay.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">${title}</h3>
+                    </div>
+                    <div class="modal-body">${message}</div>
+                    <div class="modal-footer">
+                        <button class="btn secondary" onclick="this.closest('.modal-overlay').remove()">
+                            ${cancelText}
+                        </button>
+                        <button class="btn primary confirm-btn" data-confirm="true">
+                            ${confirmText}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            const confirmBtn = overlay.querySelector('.confirm-btn');
+            confirmBtn.addEventListener('click', () => {
+                overlay.remove();
+                resolve(true);
+            });
+            
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                    resolve(false);
+                }
+            });
+        });
+    }
+}
+
+// ==================== BUTTON UTILITIES ====================
+class ButtonHelper {
+    // Add loading state to button
+    static setLoading(button, isLoading = true) {
+        if (isLoading) {
+            button.classList.add('loading');
+            button.disabled = true;
+            button.dataset.originalText = button.textContent;
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+            if (button.dataset.originalText) {
+                button.textContent = button.dataset.originalText;
+            }
+        }
+    }
+
+    // Add success state temporarily
+    static showSuccess(button, duration = 2000) {
+        const originalClass = button.className;
+        button.classList.add('success');
+        setTimeout(() => {
+            button.className = originalClass;
+        }, duration);
+    }
+
+    // Add error state temporarily
+    static showError(button, duration = 2000) {
+        const originalClass = button.className;
+        button.classList.add('error');
+        setTimeout(() => {
+            button.className = originalClass;
+        }, duration);
+    }
+
+    // Disable button with feedback
+    static disable(button, reason = '') {
+        button.disabled = true;
+        if (reason) button.setAttribute('data-tooltip', reason);
+    }
+
+    // Enable button
+    static enable(button) {
+        button.disabled = false;
+        button.removeAttribute('data-tooltip');
+    }
+}
+
+// ==================== ENHANCED START/STOP SYSTEM ====================
 let activeSystem = null;
 
-function startSystem(type) {
-    fetch("/start-" + type);
+async function startSystem(type) {
+    const btn = event.target;
+    
+    try {
+        ButtonHelper.setLoading(btn);
+        notify.info(`Starting ${type}...`);
+        
+        let body = {};
+        
+        // Add type-specific data
+        if (type === 'game') {
+            const modeSelect = document.getElementById('game-mode');
+            if (modeSelect) {
+                body.mode = modeSelect.value;
+            }
+        }
+        
+        const response = await fetch(`/start-${type}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to start');
+        }
+        
+        ButtonHelper.setLoading(btn, false);
+        ButtonHelper.showSuccess(btn);
+        notify.success(`${type} system started! ✓`);
+        
+        activeSystem = type;
+        updateSystemUI(type, true);
+        
+    } catch (error) {
+        ButtonHelper.setLoading(btn, false);
+        ButtonHelper.showError(btn);
+        notify.error(`Failed to start ${type}: ${error.message}`);
+    }
 }
 
-function stopSystem(type) {
-    fetch("/stop-" + type);
+async function stopSystem(type) {
+    const btn = event.target;
+    
+    const confirmed = await ConfirmDialog.show(
+        '⚠ Stop System?',
+        `Are you sure you want to stop the ${type} system?`,
+        'Stop',
+        'Cancel'
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+        ButtonHelper.setLoading(btn);
+        notify.info(`Stopping ${type}...`);
+        
+        const response = await fetch(`/stop-${type}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) throw new Error('Failed to stop');
+        
+        ButtonHelper.setLoading(btn, false);
+        ButtonHelper.showSuccess(btn);
+        notify.success(`${type} system stopped!`);
+        
+        activeSystem = null;
+        updateSystemUI(type, false);
+        
+    } catch (error) {
+        ButtonHelper.setLoading(btn, false);
+        ButtonHelper.showError(btn);
+        notify.error(`Failed to stop ${type}: ${error.message}`);
+    }
 }
+
+// Update UI based on system state
+function updateSystemUI(type, isRunning) {
+    const startBtn = document.querySelector(`#start-btn, #start-game-btn, [onclick*="start${type}"]`);
+    const stopBtn = document.querySelector(`#stop-btn, #stop-game-btn, [onclick*="stop${type}"]`);
+    
+    if (startBtn) startBtn.disabled = isRunning;
+    if (stopBtn) stopBtn.disabled = !isRunning;
+}
+
+// ==================== FORM HELPERS ====================
+function addFormFeedback(form) {
+    form.addEventListener('submit', function(e) {
+        const btn = this.querySelector('button[type="submit"]');
+        if (btn) {
+            ButtonHelper.setLoading(btn);
+        }
+    });
+}
+
+// ==================== INITIALIZE ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Add tooltips to all buttons with data-tooltip
+    document.querySelectorAll('.btn[data-tooltip]').forEach(btn => {
+        btn.style.cursor = 'help';
+    });
+    
+    // Add feedback to form submissions
+    document.querySelectorAll('form').forEach(addFormFeedback);
+    
+    // Keyboard accessibility
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    });
+});
+
+// Legacy support
+function startGame() {
+    startSystem('game');
+}
+
+function stopGame() {
+    stopSystem('game');
+}
+
+function startVoiceUI() {
+    startSystem('voice');
+}
+
+function stopVoiceUI() {
+    stopSystem('voice');
+}
+
+// ==================== AD MANAGEMENT SYSTEM ====================
+class AdManager {
+    constructor() {
+        this.ads = {
+            'banner-top': { visible: true, closed: false },
+            'sidebar-left': { visible: true, closed: false },
+            'sidebar-right': { visible: true, closed: false },
+            'banner-bottom': { visible: true, closed: false }
+        };
+        this.initializeAds();
+    }
+
+    initializeAds() {
+        // Load ad state from localStorage
+        const savedState = localStorage.getItem('adState');
+        if (savedState) {
+            this.ads = JSON.parse(savedState);
+            this.applyAdState();
+        }
+        
+        // Initialize ads on page load
+        this.loadAds();
+    }
+
+    loadAds() {
+        // Top Banner Ad
+        this.loadAd('banner-top', {
+            type: 'banner',
+            size: '1200×100',
+            position: 'top'
+        });
+        
+        // Sidebar Ads
+        this.loadAd('sidebar-left', {
+            type: 'sidebar',
+            size: '160×600',
+            position: 'left'
+        });
+        
+        this.loadAd('sidebar-right', {
+            type: 'sidebar',
+            size: '160×600',
+            position: 'right'
+        });
+        
+        // Bottom Banner Ad
+        this.loadAd('banner-bottom', {
+            type: 'banner',
+            size: '728×90',
+            position: 'bottom'
+        });
+    }
+
+    loadAd(adId, config) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (!adElement) return;
+
+        // Check if ad should be visible
+        if (!this.ads[adId].visible || this.ads[adId].closed) {
+            adElement.style.display = 'none';
+            return;
+        }
+
+        // Add data attributes for ad network integration
+        adElement.setAttribute('data-ad-size', config.size);
+        adElement.setAttribute('data-ad-position', config.position);
+        
+        // Show loading state
+        adElement.classList.add('ad-loading');
+        
+        // Simulate ad load (replace with real ad network code)
+        setTimeout(() => {
+            adElement.classList.remove('ad-loading');
+            this.trackAdImpression(adId);
+        }, 300);
+    }
+
+    closeAd(adId) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (!adElement) return;
+
+        // Fade out animation
+        adElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        adElement.style.opacity = '0';
+        adElement.style.transform = 'scale(0.95)';
+
+        setTimeout(() => {
+            adElement.style.display = 'none';
+            this.ads[adId].closed = true;
+            this.saveAdState();
+            this.trackAdClose(adId);
+        }, 300);
+    }
+
+    saveAdState() {
+        localStorage.setItem('adState', JSON.stringify(this.ads));
+    }
+
+    applyAdState() {
+        Object.keys(this.ads).forEach(adId => {
+            if (this.ads[adId].closed) {
+                const adElement = document.getElementById(`ad-${adId}`);
+                if (adElement) {
+                    adElement.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    trackAdImpression(adId) {
+        // Send ad impression to analytics
+        console.log(`Ad impression tracked: ${adId}`);
+        // TODO: Send to analytics service
+        // fetch('/api/track-ad-impression', { method: 'POST', body: JSON.stringify({ adId }) });
+    }
+
+    trackAdClose(adId) {
+        // Track when user closes ad
+        console.log(`Ad closed: ${adId}`);
+        // TODO: Send to analytics service
+    }
+
+    trackAdClick(adId) {
+        // Track ad clicks
+        console.log(`Ad clicked: ${adId}`);
+        // TODO: Send to analytics service
+    }
+
+    // Reset all ads (show them again)
+    resetAllAds() {
+        Object.keys(this.ads).forEach(adId => {
+            this.ads[adId].closed = false;
+            const adElement = document.getElementById(`ad-${adId}`);
+            if (adElement) {
+                adElement.style.display = 'flex';
+                adElement.style.opacity = '1';
+                adElement.style.transform = 'scale(1)';
+            }
+        });
+        this.saveAdState();
+    }
+
+    // Load custom ad content
+    loadCustomAd(adId, htmlContent) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (!adElement) return;
+
+        const adContent = adElement.querySelector('.ad-placeholder');
+        if (adContent) {
+            adContent.innerHTML = htmlContent;
+        }
+    }
+
+    // Load ad from URL (iframe)
+    loadAdFromUrl(adId, url) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (!adElement) return;
+
+        const adContent = adElement.querySelector('.ad-placeholder');
+        if (adContent) {
+            adContent.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
+        }
+    }
+
+    // Get ad configuration
+    getAdConfig(adId) {
+        return adElement.getAttribute('data-ad-size');
+    }
+
+    // Show specific ad
+    showAd(adId) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (adElement) {
+            adElement.style.display = 'flex';
+            this.ads[adId].visible = true;
+            this.ads[adId].closed = false;
+            this.saveAdState();
+        }
+    }
+
+    // Hide specific ad
+    hideAd(adId) {
+        const adElement = document.getElementById(`ad-${adId}`);
+        if (adElement) {
+            adElement.style.display = 'none';
+            this.ads[adId].visible = false;
+            this.saveAdState();
+        }
+    }
+}
+
+// Global Ad Manager Instance
+const adManager = new AdManager();
+
+// Global function to close ads
+function closeAd(adId) {
+    adManager.closeAd(adId);
+}
+
+// Page Navigation Handler - Reinitialize ads when navigating
+window.addEventListener('beforeunload', function() {
+    // Save ad state before leaving
+    adManager.saveAdState();
+});
+
+// Initialize ads when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Re-initialize ads on page load
+    setTimeout(() => {
+        adManager.loadAds();
+    }, 100);
+});
+
+// Monitor page visibility changes
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        // Page is hidden
+    } else {
+        // Page is visible again - refresh ads
+        adManager.loadAds();
+    }
+});
+
+// Add tracking to ad containers
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.ad-container').forEach(adEl => {
+        adEl.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('ad-close-btn')) {
+                const adId = this.id.replace('ad-', '');
+                adManager.trackAdClick(adId);
+            }
+        });
+    });
+});
 </script>
 
 </body>
