@@ -27,7 +27,11 @@ import math
 import time
 import threading
 
+<<<<<<< HEAD
 cap = cv2.VideoCapture(0)
+=======
+cap = None  # Initialize as None, will be created when starting
+>>>>>>> b7a4701 (updated the mouse gesture feature)
 
 screen_w, screen_h = pyautogui.size()
 
@@ -37,7 +41,11 @@ gesture_text = "None"
 prev_x, prev_y = 0, 0
 last_click_time = 0
 last_gesture = "NONE"
+<<<<<<< HEAD
 gesture_cooldown = 0.5
+=======
+gesture_cooldown = 1.0  # Increased to 1 second to prevent accidental clicks
+>>>>>>> b7a4701 (updated the mouse gesture feature)
 
 running = False  # 🔴 control flag
 gesture_thread = None  # 🔴 thread reference
@@ -67,8 +75,21 @@ def get_status():
 
 def start_gesture():
     """✨ START GESTURE - Spawn background thread"""
+<<<<<<< HEAD
     global gesture_thread, running
     if gesture_thread is None or not gesture_thread.is_alive():
+=======
+    global gesture_thread, running, cap
+    if gesture_thread is None or not gesture_thread.is_alive():
+        # Initialize camera
+        if cap is None or not cap.isOpened():
+            cap = cv2.VideoCapture(0)
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            cap.set(cv2.CAP_PROP_FPS, 30)
+            time.sleep(1)  # Give camera time to initialize
+        
+>>>>>>> b7a4701 (updated the mouse gesture feature)
         running = True
         gesture_thread = threading.Thread(target=gesture_loop, daemon=True)
         gesture_thread.start()
@@ -77,11 +98,24 @@ def start_gesture():
 
 def stop_gesture():
     """🛑 STOP GESTURE - Stop background thread"""
+<<<<<<< HEAD
     global running, gesture_thread
+=======
+    global running, gesture_thread, cap
+>>>>>>> b7a4701 (updated the mouse gesture feature)
     running = False
     if gesture_thread and gesture_thread.is_alive():
         gesture_thread.join(timeout=2)  # Wait max 2 seconds
     gesture_thread = None
+<<<<<<< HEAD
+=======
+    
+    # Release camera
+    if cap is not None:
+        cap.release()
+        cap = None
+    
+>>>>>>> b7a4701 (updated the mouse gesture feature)
     print("🛑 Gesture System Stopped")
 
 
@@ -131,11 +165,20 @@ def detect_swipe(cx, cy, prev_cx, prev_cy):
 
 
 def gesture_loop():
+<<<<<<< HEAD
     global frame_global, gesture_text, prev_x, prev_y, last_click_time, running, last_gesture
+=======
+    global frame_global, gesture_text, prev_x, prev_y, last_click_time, running, last_gesture, cap
+>>>>>>> b7a4701 (updated the mouse gesture feature)
     
     prev_cx, prev_cy = 0, 0
     gesture_time = time.time()
     gesture_confidence = 0
+<<<<<<< HEAD
+=======
+    gesture_stable_count = 0  # Track gesture stability
+    last_detected_gesture = "NONE"
+>>>>>>> b7a4701 (updated the mouse gesture feature)
 
     while True:
 
@@ -143,8 +186,22 @@ def gesture_loop():
             time.sleep(0.1)
             continue
 
+<<<<<<< HEAD
         ret, frame = cap.read()
         if not ret:
+=======
+        # Check if camera is available
+        if cap is None or not cap.isOpened():
+            frame_global = None
+            gesture_text = "Camera not available"
+            time.sleep(0.1)
+            continue
+
+        ret, frame = cap.read()
+        if not ret:
+            gesture_text = "Failed to read camera"
+            time.sleep(0.1)
+>>>>>>> b7a4701 (updated the mouse gesture feature)
             continue
 
         frame = cv2.flip(frame, 1)
@@ -184,12 +241,23 @@ def gesture_loop():
                 cx = x + w // 2
                 cy = y + h // 2
 
+<<<<<<< HEAD
                 # Cursor mapping with smoothing
                 screen_x = np.interp(cx, [0, 300], [screen_w, 0])
                 screen_y = np.interp(cy, [0, 300], [0, screen_h])
 
                 smooth_x = prev_x + (screen_x - prev_x) * 0.7
                 smooth_y = prev_y + (screen_y - prev_y) * 0.7
+=======
+                # ✅ FIXED: Correct cursor mapping (not inverted)
+                screen_x = np.interp(cx, [0, 300], [0, screen_w])  # Left hand = left screen
+                screen_y = np.interp(cy, [0, 300], [0, screen_h])  # Top hand = top screen
+
+                # ✅ FIXED: Reduced smoothing for more responsive control
+                smooth_factor = 0.3  # Lower = more responsive (was 0.7)
+                smooth_x = prev_x + (screen_x - prev_x) * smooth_factor
+                smooth_y = prev_y + (screen_y - prev_y) * smooth_factor
+>>>>>>> b7a4701 (updated the mouse gesture feature)
 
                 pyautogui.moveTo(int(smooth_x), int(smooth_y), duration=0.01)
                 prev_x, prev_y = smooth_x, smooth_y
@@ -202,6 +270,7 @@ def gesture_loop():
                     defects = cv2.convexityDefects(cnt, hull)
                     defect_count = count_fingers(defects, cnt)
 
+<<<<<<< HEAD
                 # GESTURE DETECTION LOGIC
                 current_time = time.time()
 
@@ -230,10 +299,31 @@ def gesture_loop():
                         last_gesture = "DOUBLE_CLICK"
 
                 elif defect_count >= 4:
+=======
+                # ✅ FIXED: Correct gesture detection logic
+                current_time = time.time()
+                detected_gesture = "NONE"
+
+                if defect_count == 0:
+                    detected_gesture = "FIST"
+                    gesture_text = f"✊ FIST - Left Click (Confidence: {gesture_confidence}%)"
+                    
+                elif defect_count == 1:
+                    detected_gesture = "TWO_FINGERS"
+                    gesture_text = f"✌️ TWO FINGERS - Right Click (Confidence: {gesture_confidence}%)"
+                    
+                elif defect_count == 2:
+                    detected_gesture = "THREE_FINGERS"
+                    gesture_text = f"🤟 THREE FINGERS - Double Click (Confidence: {gesture_confidence}%)"
+
+                elif defect_count >= 3:
+                    detected_gesture = "OPEN_HAND"
+>>>>>>> b7a4701 (updated the mouse gesture feature)
                     # Detect swipe
                     swipe = detect_swipe(cx, cy, prev_cx, prev_cy)
                     
                     if swipe == "LEFT":
+<<<<<<< HEAD
                         gesture_text = f"← SWIPE LEFT (Confidence: {gesture_confidence}%)"
                         pyautogui.scroll(5)  # Scroll up
                         last_gesture = "SWIPE_LEFT"
@@ -254,6 +344,75 @@ def gesture_loop():
 
                     prev_cx, prev_cy = cx, cy
 
+=======
+                        detected_gesture = "SWIPE_LEFT"
+                        gesture_text = f"← SWIPE LEFT (Confidence: {gesture_confidence}%)"
+                    elif swipe == "RIGHT":
+                        detected_gesture = "SWIPE_RIGHT"
+                        gesture_text = f"→ SWIPE RIGHT (Confidence: {gesture_confidence}%)"
+                    elif swipe == "UP":
+                        detected_gesture = "SWIPE_UP"
+                        gesture_text = f"↑ SWIPE UP (Confidence: {gesture_confidence}%)"
+                    elif swipe == "DOWN":
+                        detected_gesture = "SWIPE_DOWN"
+                        gesture_text = f"↓ SWIPE DOWN (Confidence: {gesture_confidence}%)"
+                    else:
+                        gesture_text = f"👋 OPEN HAND - Move Cursor (Confidence: {gesture_confidence}%)"
+
+                    prev_cx, prev_cy = cx, cy
+
+                # ✅ FIXED: Gesture stability check (must detect same gesture 3 times)
+                if detected_gesture == last_detected_gesture:
+                    gesture_stable_count += 1
+                else:
+                    gesture_stable_count = 0
+                    last_detected_gesture = detected_gesture
+
+                # Only trigger action if gesture is stable and cooldown passed
+                if gesture_stable_count >= 3 and current_time - gesture_time > gesture_cooldown:
+                    if detected_gesture == "FIST":
+                        pyautogui.click()
+                        gesture_time = current_time
+                        last_gesture = "CLICK"
+                        gesture_stable_count = 0
+                        
+                    elif detected_gesture == "TWO_FINGERS":
+                        pyautogui.click(button='right')
+                        gesture_time = current_time
+                        last_gesture = "RIGHT_CLICK"
+                        gesture_stable_count = 0
+                        
+                    elif detected_gesture == "THREE_FINGERS":
+                        pyautogui.click(clicks=2)
+                        gesture_time = current_time
+                        last_gesture = "DOUBLE_CLICK"
+                        gesture_stable_count = 0
+                        
+                    elif detected_gesture == "SWIPE_LEFT":
+                        pyautogui.scroll(5)
+                        gesture_time = current_time
+                        last_gesture = "SWIPE_LEFT"
+                        gesture_stable_count = 0
+                        
+                    elif detected_gesture == "SWIPE_RIGHT":
+                        pyautogui.scroll(-5)
+                        gesture_time = current_time
+                        last_gesture = "SWIPE_RIGHT"
+                        gesture_stable_count = 0
+                        
+                    elif detected_gesture == "SWIPE_UP":
+                        pyautogui.press('up')
+                        gesture_time = current_time
+                        last_gesture = "SWIPE_UP"
+                        gesture_stable_count = 0
+                        
+                    elif detected_gesture == "SWIPE_DOWN":
+                        pyautogui.press('down')
+                        gesture_time = current_time
+                        last_gesture = "SWIPE_DOWN"
+                        gesture_stable_count = 0
+
+>>>>>>> b7a4701 (updated the mouse gesture feature)
                 cv2.rectangle(roi, (x, y), (x+w, y+h), (0, 255, 0), 2)
                 cv2.circle(roi, (cx, cy), 5, (0, 0, 255), -1)
                 
@@ -263,6 +422,14 @@ def gesture_loop():
                 cv2.rectangle(roi, (10, 260), (10 + bar_width, 280), (0, 255, 0), -1)
                 cv2.putText(roi, f"Conf: {gesture_confidence}%", (10, 295),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
+<<<<<<< HEAD
+=======
+                
+                # Show stability indicator
+                stability_text = f"Stability: {gesture_stable_count}/3"
+                cv2.putText(roi, stability_text, (10, 250),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 1)
+>>>>>>> b7a4701 (updated the mouse gesture feature)
 
         # Display info on frame
         cv2.putText(frame, f"Gesture: {gesture_text}", (10, 450),

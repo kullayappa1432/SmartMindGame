@@ -1,6 +1,7 @@
 from flask import Flask, render_template, Response, jsonify, request, redirect, url_for, flash
 from flask_login import LoginManager, current_user, login_required
 import cv2
+import numpy as np
 import time
 import os
 from datetime import datetime
@@ -11,7 +12,7 @@ load_dotenv()
 
 # ✅ IMPORT CORRECT FUNCTIONS
 from modules.voice.voice_control import start_voice, stop_voice, get_chat
-from modules.gesture.gesture_mouse import (
+from modules.gesture.gesture_mouse_mediapipe import (
     start_gesture,
     stop_gesture,
     get_gesture,
@@ -106,24 +107,54 @@ with app.app_context():
 # 🎥 VIDEO STREAM (FIXED)
 # =========================
 def generate_frames():
+    """Generate video frames for streaming"""
+    print("🎥 generate_frames() started")
+    frame_count = 0
+    
     while True:
         frame = get_frame()
 
         if frame is None:
-            time.sleep(0.01)
-            continue
-
-        _, buffer = cv2.imencode('.jpg', frame)
-        frame_bytes = buffer.tobytes()
+            # Create a placeholder frame when camera is not ready
+            placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
+            
+            # Add more informative message
+            if frame_count < 10:
+                message = "Camera Initializing..."
+            else:
+                message = "Camera Not Available"
+            
+            cv2.putText(placeholder, message, (150, 240),
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            
+            if frame_count == 0:
+                print("⚠️ generate_frames: No frame available yet")
+            
+            _, buffer = cv2.imencode('.jpg', placeholder)
+            frame_bytes = buffer.tobytes()
+        else:
+            if frame_count == 0:
+                print(f"✅ generate_frames: First frame received! Shape: {frame.shape}")
+            
+            _, buffer = cv2.imencode('.jpg', frame)
+            frame_bytes = buffer.tobytes()
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        
+        frame_count += 1
+        time.sleep(0.033)  # ~30 FPS
 
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(generate_frames(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    print("📹 /video_feed route called")
+    try:
+        return Response(generate_frames(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+    except Exception as e:
+        print(f"❌ Error in video_feed: {e}")
+        return "Video feed error", 500
 
 
 # =========================
@@ -155,18 +186,51 @@ def voice():
     return render_template('voice.html')
 
 
+@app.route('/test-video')
+def test_video():
+    """Test page for video feed debugging - no login required for testing"""
+    return render_template('test_video.html')
+
+
+@app.route('/test-start-gesture', methods=['POST'])
+def test_start_gesture():
+    """Test route without login requirement"""
+    print("🎬 /test-start-gesture route called (no auth)")
+    success = start_gesture()
+    if success:
+        print("✅ Gesture started successfully")
+        return jsonify({"status": "Gesture Started", "success": True})
+    else:
+        print("❌ Failed to start gesture")
+        return jsonify({"status": "Failed to start camera", "success": False, "error": "Camera initialization failed"}), 500
+
+
+@app.route('/test-stop-gesture', methods=['POST'])
+def test_stop_gesture():
+    """Test route without login requirement"""
+    stop_gesture()
+    return jsonify({"status": "Gesture Stopped"})
+
+
 # =========================
 # ✋ GESTURE ROUTES
 # =========================
-@app.route('/start-gesture')
+@app.route('/start-gesture', methods=['GET','POST'])
 @login_required
 def start_gesture_route():
-    start_gesture()
-    log_activity('start_gesture', 'Gesture recognition started')
-    return jsonify({"status": "Gesture Started"})
+    print("🎬 /start-gesture route called")
+    print(f"   User: {current_user.username if current_user.is_authenticated else 'Not authenticated'}")
+    success = start_gesture()
+    if success:
+        log_activity('start_gesture', 'Gesture recognition started')
+        print("✅ Gesture started successfully")
+        return jsonify({"status": "Gesture Started", "success": True})
+    else:
+        print("❌ Failed to start gesture")
+        return jsonify({"status": "Failed to start camera", "success": False, "error": "Camera initialization failed"}), 500
 
 
-@app.route('/stop-gesture')
+@app.route('/stop-gesture', methods=['POST'])
 @login_required
 def stop_gesture_route():
     stop_gesture()

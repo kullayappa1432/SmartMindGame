@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Feed Test</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        img {
+            width: 100%;
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+        }
+        .info {
+            background: rgba(34, 197, 94, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #22c55e;
+        }
+        button {
+            background: #22c55e;
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4ade80;
+        }
+        #status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .error { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .info-text { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Video Feed Test Page</h1>
+        
+        <div class="info">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Click "Start Gesture System" button</li>
+                <li>Wait 3 seconds for camera to initialize</li>
+                <li>Video feed should appear below</li>
+                <li>Check browser console (F12) for debug messages</li>
+            </ol>
+        </div>
+
+        <div>
+            <button onclick="startGesture()">▶️ Start Gesture System</button>
+            <button onclick="stopGesture()">⏹️ Stop Gesture System</button>
+            <button onclick="reloadVideo()">🔄 Reload Video Feed</button>
+        </div>
+
+        <div id="status" class="info-text">
+            Status: Ready to start
+        </div>
+
+        <h2>Live Camera Feed:</h2>
+        <img id="video-feed" src="" alt="Video feed will appear here">
+
+        <div class="info" style="margin-top: 20px;">
+            <h3>🔍 Debug Info:</h3>
+            <p><strong>Video Feed URL:</strong> <span id="feed-url">Not set</span></p>
+            <p><strong>Image Load Status:</strong> <span id="load-status">Not loaded</span></p>
+            <p><strong>Console Messages:</strong> Check browser console (F12)</p>
+        </div>
+    </div>
+
+    <script>
+        const videoFeed = document.getElementById('video-feed');
+        const status = document.getElementById('status');
+        const feedUrl = document.getElementById('feed-url');
+        const loadStatus = document.getElementById('load-status');
+
+        // Video feed event handlers
+        videoFeed.onload = function() {
+            console.log('✅ Video feed loaded successfully');
+            loadStatus.textContent = 'Loaded ✅';
+            loadStatus.style.color = '#22c55e';
+        };
+
+        videoFeed.onerror = function(e) {
+            console.error('❌ Video feed error:', e);
+            loadStatus.textContent = 'Error ❌';
+            loadStatus.style.color = '#ef4444';
+            status.className = 'error';
+            status.textContent = 'Error: Video feed failed to load';
+        };
+
+        function startGesture() {
+            console.log('🎬 Starting gesture system...');
+            status.className = 'info-text';
+            status.textContent = 'Status: Starting camera...';
+
+            fetch('/test-start-gesture', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('✅ Start gesture response:', data);
+                    
+                    if (data.success === false) {
+                        status.className = 'error';
+                        status.textContent = 'Error: ' + (data.error || 'Failed to start camera');
+                        return;
+                    }
+
+                    status.className = 'success';
+                    status.textContent = 'Status: Camera started! Loading video feed...';
+
+                    // Wait 2 seconds for camera to fully initialize
+                    setTimeout(() => {
+                        reloadVideo();
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('❌ Error starting gesture:', err);
+                    status.className = 'error';
+                    status.textContent = 'Error: ' + err.message;
+                });
+        }
+
+        function stopGesture() {
+            console.log('🛑 Stopping gesture system...');
+            
+            fetch('/test-stop-gesture', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('✅ Stop gesture response:', data);
+                    status.className = 'info-text';
+                    status.textContent = 'Status: Camera stopped';
+                    videoFeed.src = '';
+                    feedUrl.textContent = 'Not set';
+                    loadStatus.textContent = 'Not loaded';
+                })
+                .catch(err => {
+                    console.error('❌ Error stopping gesture:', err);
+                });
+        }
+
+        function reloadVideo() {
+            const timestamp = new Date().getTime();
+            const url = '/video_feed?t=' + timestamp;
+            
+            console.log('🔄 Loading video feed:', url);
+            
+            videoFeed.src = url;
+            feedUrl.textContent = url;
+            loadStatus.textContent = 'Loading...';
+            
+            status.className = 'info-text';
+            status.textContent = 'Status: Loading video feed...';
+        }
+
+        // Log page load
+        console.log('📄 Test page loaded');
+        console.log('🔍 Open browser console (F12) to see debug messages');
+    </script>
+</body>
+</html>
