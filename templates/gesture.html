@@ -19,7 +19,13 @@
 
         <!-- Camera Box -->
         <div style="position:relative; background:rgba(0,0,0,0.3); border-radius:10px; overflow:hidden;">
+<<<<<<< HEAD
             <img id="video-stream" src="" style="width:100%; border-radius:10px; display:none;">
+=======
+            <img id="video-stream" src="" style="width:100%; border-radius:10px; display:none;" 
+                 onerror="console.error('Video stream error'); document.getElementById('camera-placeholder').style.display='flex'; this.style.display='none';"
+                 onload="console.log('Video stream loaded successfully');">
+>>>>>>> b7a4701 (updated the mouse gesture feature)
             
             <!-- Placeholder when not running -->
             <div id="camera-placeholder" style="width:100%; height:300px; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); display:flex; align-items:center; justify-content:center; border-radius:10px;">
@@ -267,11 +273,34 @@ function startSystem(type) {
         fetch("/start-gesture")
         .then(res => res.json())
         .then(data => {
+<<<<<<< HEAD
+=======
+            console.log("Start gesture response:", data);
+            
+            // Check if camera started successfully
+            if (data.success === false) {
+                console.error("Camera failed to start:", data.error);
+                document.getElementById("gesture-status").innerText = "● Error: " + (data.error || "Camera failed");
+                document.getElementById("gesture-status").className = "status stopped";
+                startBtn.disabled = false;
+                return;
+            }
+            
+>>>>>>> b7a4701 (updated the mouse gesture feature)
             // Update UI
             document.getElementById("camera-placeholder").style.display = "none";
             document.getElementById("video-stream").style.display = "block";
             document.getElementById("gesture-label").style.display = "block";
+<<<<<<< HEAD
             document.getElementById("video-stream").src = "/video_feed";
+=======
+            
+            // Add timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            document.getElementById("video-stream").src = "/video_feed?t=" + timestamp;
+            
+            console.log("Video feed URL set to:", "/video_feed?t=" + timestamp);
+>>>>>>> b7a4701 (updated the mouse gesture feature)
             
             document.getElementById("gesture-status").innerText = "● Running";
             document.getElementById("gesture-status").className = "status running";
@@ -283,10 +312,18 @@ function startSystem(type) {
             document.getElementById("instructions-panel").style.display = "block";
         })
         .catch(err => {
+<<<<<<< HEAD
             console.error("Error:", err);
             document.getElementById("gesture-status").innerText = "● Error";
             document.getElementById("gesture-status").className = "status stopped";
             startBtn.disabled = false;
+=======
+            console.error("Error starting gesture:", err);
+            document.getElementById("gesture-status").innerText = "● Error";
+            document.getElementById("gesture-status").className = "status stopped";
+            startBtn.disabled = false;
+            alert("Failed to start gesture control. Check browser console (F12) for details.");
+>>>>>>> b7a4701 (updated the mouse gesture feature)
         });
     }
 }
