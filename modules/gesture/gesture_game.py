@@ -33,6 +33,10 @@ import numpy as np
 import pygame
 import random
 import sys
+import os
+
+# Add parent directory to path for gesture_mouse import
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -47,7 +51,7 @@ pygame.init()
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption("Gesture-Based Games")
+pygame.display.set_caption("🎮 Gesture-Based Games")
 
 # Colors
 BLACK = (0, 0, 0)
@@ -64,6 +68,37 @@ font_small = pygame.font.Font(None, 24)
 
 # Camera
 cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    print("Error: Could not open camera")
+    sys.exit(1)
+
+# Game mode difficulty settings
+DIFFICULTY_SETTINGS = {
+    "easy": {
+        "spawn_rate_multiplier": 1.5,  # Slower spawn
+        "speed_multiplier": 0.7,        # Slower obstacles
+        "score_multiplier": 2.0         # More points per obstacle
+    },
+    "medium": {
+        "spawn_rate_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "score_multiplier": 1.0
+    },
+    "hard": {
+        "spawn_rate_multiplier": 0.7,   # Faster spawn
+        "speed_multiplier": 1.4,         # Faster obstacles
+        "score_multiplier": 1.5          # More points
+    }
+}
+
+# Get game mode from command line
+game_mode = "medium"
+if len(sys.argv) > 1:
+    game_mode = sys.argv[1].lower()
+    if game_mode not in DIFFICULTY_SETTINGS:
+        game_mode = "medium"
+
+difficulty = DIFFICULTY_SETTINGS[game_mode]
 
 # ==================== GAME STATE ====================
 class GameState:
@@ -86,7 +121,7 @@ class TempleRunGame(GameState):
         self.player_speed = 5
         
         self.obstacles = []
-        self.obstacle_spawn_rate = 30
+        self.base_spawn_rate = int(30 * difficulty["spawn_rate_multiplier"])
         self.frame_count = 0
         self.score = 0
         
@@ -107,11 +142,11 @@ class TempleRunGame(GameState):
         self.frame_count += 1
         
         # Spawn obstacles
-        if self.frame_count % self.obstacle_spawn_rate == 0:
+        if self.frame_count % self.base_spawn_rate == 0:
             obs_x = random.randint(0, WINDOW_WIDTH - 40)
             self.obstacles.append({
                 'x': obs_x, 'y': -40, 'width': 40, 'height': 40,
-                'speed': 5 + self.score // 100
+                'speed': (5 + self.score // 100) * difficulty["speed_multiplier"]
             })
         
         # Move obstacles
@@ -128,7 +163,7 @@ class TempleRunGame(GameState):
             # Remove off-screen obstacles
             if obs['y'] > WINDOW_HEIGHT:
                 self.obstacles.remove(obs)
-                self.score += 10
+                self.score += int(10 * difficulty["score_multiplier"])
         
         # Gravity (simple jump mechanic)
         if self.player_y < WINDOW_HEIGHT - 80:
@@ -154,6 +189,8 @@ class TempleRunGame(GameState):
         # Draw UI
         score_text = font_medium.render(f"Score: {self.score}", True, WHITE)
         surface.blit(score_text, (10, 10))
+        mode_text = font_small.render(f"Mode: {game_mode.upper()}", True, YELLOW)
+        surface.blit(mode_text, (10, 50))
         
         if self.game_over:
             game_over_text = font_large.render("GAME OVER!", True, RED)
@@ -174,7 +211,7 @@ class SubwaySurfersGame(GameState):
         self.player_height = 50
         
         self.trains = []
-        self.spawn_rate = 40
+        self.base_spawn_rate = int(40 * difficulty["spawn_rate_multiplier"])
         self.frame_count = 0
         self.score = 0
         
@@ -194,12 +231,12 @@ class SubwaySurfersGame(GameState):
         self.frame_count += 1
         
         # Spawn trains
-        if self.frame_count % self.spawn_rate == 0:
+        if self.frame_count % self.base_spawn_rate == 0:
             lane = random.randint(0, 2)
             train_x = 100 + lane * 250
             self.trains.append({
                 'x': train_x, 'y': -50, 'width': 80, 'height': 40,
-                'speed': 7 + self.score // 100
+                'speed': (7 + self.score // 100) * difficulty["speed_multiplier"]
             })
         
         # Move trains
@@ -215,7 +252,7 @@ class SubwaySurfersGame(GameState):
             
             if train['y'] > WINDOW_HEIGHT:
                 self.trains.remove(train)
-                self.score += 15
+                self.score += int(15 * difficulty["score_multiplier"])
         
         # Gravity
         if self.player_y < WINDOW_HEIGHT - 100:
@@ -247,6 +284,8 @@ class SubwaySurfersGame(GameState):
         # Draw UI
         score_text = font_medium.render(f"Score: {self.score}", True, WHITE)
         surface.blit(score_text, (10, 10))
+        mode_text = font_small.render(f"Mode: {game_mode.upper()}", True, YELLOW)
+        surface.blit(mode_text, (10, 50))
         
         if self.game_over:
             game_over_text = font_large.render("CRASHED!", True, RED)
@@ -264,7 +303,7 @@ class CarRacingGame(GameState):
         self.player_speed = 6
         
         self.traffic = []
-        self.spawn_rate = 35
+        self.base_spawn_rate = int(35 * difficulty["spawn_rate_multiplier"])
         self.frame_count = 0
         self.score = 0
         
@@ -279,11 +318,11 @@ class CarRacingGame(GameState):
         """Update game state"""
         self.frame_count += 1
         
-        if self.frame_count % self.spawn_rate == 0:
+        if self.frame_count % self.base_spawn_rate == 0:
             traffic_x = random.choice([100, 350, 600])
             self.traffic.append({
                 'x': traffic_x, 'y': -60, 'width': 50, 'height': 60,
-                'speed': 6 + self.score // 150
+                'speed': (6 + self.score // 150) * difficulty["speed_multiplier"]
             })
         
         for car in self.traffic[:]:
@@ -297,7 +336,7 @@ class CarRacingGame(GameState):
             
             if car['y'] > WINDOW_HEIGHT:
                 self.traffic.remove(car)
-                self.score += 20
+                self.score += int(20 * difficulty["score_multiplier"])
     
     def draw(self, surface):
         """Draw game on surface"""
@@ -322,6 +361,8 @@ class CarRacingGame(GameState):
         
         score_text = font_medium.render(f"Score: {self.score}", True, WHITE)
         surface.blit(score_text, (10, 10))
+        mode_text = font_small.render(f"Mode: {game_mode.upper()}", True, YELLOW)
+        surface.blit(mode_text, (10, 50))
         
         if self.game_over:
             game_over_text = font_large.render("COLLISION!", True, RED)
@@ -338,7 +379,7 @@ class FlappyBirdGame(GameState):
         self.velocity = 0
         
         self.pipes = []
-        self.pipe_spawn_rate = 80
+        self.base_spawn_rate = int(80 * difficulty["spawn_rate_multiplier"])
         self.frame_count = 0
         self.score = 0
         
@@ -356,7 +397,7 @@ class FlappyBirdGame(GameState):
         self.player_y += self.velocity
         
         # Spawn pipes
-        if self.frame_count % self.pipe_spawn_rate == 0:
+        if self.frame_count % self.base_spawn_rate == 0:
             gap = 100
             gap_y = random.randint(50, WINDOW_HEIGHT - gap - 50)
             self.pipes.append({
@@ -364,7 +405,7 @@ class FlappyBirdGame(GameState):
                 'gap_y': gap_y,
                 'gap': gap,
                 'width': 50,
-                'speed': 5 + self.score // 100
+                'speed': (5 + self.score // 100) * difficulty["speed_multiplier"]
             })
         
         # Move pipes
@@ -380,7 +421,7 @@ class FlappyBirdGame(GameState):
             
             if pipe['x'] < -50:
                 self.pipes.remove(pipe)
-                self.score += 25
+                self.score += int(25 * difficulty["score_multiplier"])
         
         # Check bounds
         if self.player_y < 0 or self.player_y > WINDOW_HEIGHT:
@@ -407,6 +448,8 @@ class FlappyBirdGame(GameState):
         
         score_text = font_medium.render(f"Score: {self.score}", True, WHITE)
         surface.blit(score_text, (10, 10))
+        mode_text = font_small.render(f"Mode: {game_mode.upper()}", True, YELLOW)
+        surface.blit(mode_text, (10, 50))
         
         if self.game_over:
             game_over_text = font_large.render("GAME OVER!", True, RED)
@@ -424,7 +467,7 @@ class DinosaurRunGame(GameState):
         self.velocity = 0
         
         self.obstacles = []
-        self.spawn_rate = 50
+        self.base_spawn_rate = int(50 * difficulty["spawn_rate_multiplier"])
         self.frame_count = 0
         self.score = 0
         
@@ -447,11 +490,11 @@ class DinosaurRunGame(GameState):
             self.velocity = 0
         
         # Spawn obstacles
-        if self.frame_count % self.spawn_rate == 0:
+        if self.frame_count % self.base_spawn_rate == 0:
             self.obstacles.append({
                 'x': WINDOW_WIDTH, 'y': WINDOW_HEIGHT - 60,
                 'width': 30, 'height': 50,
-                'speed': 7 + self.score // 120
+                'speed': (7 + self.score // 120) * difficulty["speed_multiplier"]
             })
         
         # Move obstacles
@@ -467,7 +510,7 @@ class DinosaurRunGame(GameState):
             
             if obs['x'] < -50:
                 self.obstacles.remove(obs)
-                self.score += 10
+                self.score += int(10 * difficulty["score_multiplier"])
     
     def draw(self, surface):
         """Draw game on surface"""
@@ -492,6 +535,8 @@ class DinosaurRunGame(GameState):
         # Draw UI
         score_text = font_medium.render(f"Score: {self.score}", True, BLACK)
         surface.blit(score_text, (10, 10))
+        mode_text = font_small.render(f"Mode: {game_mode.upper()}", True, BLACK)
+        surface.blit(mode_text, (10, 50))
         
         if self.game_over:
             game_over_text = font_large.render("GAME OVER!", True, RED)
@@ -528,6 +573,10 @@ def run_game():
     show_menu = True
     
     clock = pygame.time.Clock()
+    
+    # Track last gesture time to prevent rapid repeated gestures
+    last_gesture_time = 0
+    gesture_cooldown = 0.2
     
     while game_running:
         # Keyboard input
@@ -570,6 +619,7 @@ def run_game():
         # Camera frame
         success, frame = cap.read()
         if not success:
+            print("Warning: Failed to read camera frame")
             break
         
         frame = cv2.flip(frame, 1)
@@ -577,6 +627,7 @@ def run_game():
         # Hand detection
         results = hands.process(frame)
         gesture = "NONE"
+        current_time = pygame.time.get_ticks() / 1000.0
         
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
@@ -584,7 +635,7 @@ def run_game():
                 x = int(tip.x * frame.shape[1])
                 y = int(tip.y * frame.shape[0])
                 
-                # Simple gesture detection
+                # Simple gesture detection based on hand position
                 if x < frame.shape[1] // 3:
                     gesture = "LEFT"
                 elif x > frame.shape[1] * 2 // 3:
@@ -594,20 +645,12 @@ def run_game():
                     gesture = "UP"
                 elif y > frame.shape[0] * 3 // 4:
                     gesture = "DOWN"
-                
-                cv2.circle(frame, (x, y), 10, (0, 255, 0), -1)
         
-        cv2.putText(frame, f"Gesture: {gesture}", (10, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(frame, "Press Q to return to menu", (10, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 1)
-        
-        cv2.imshow("Gesture Control", frame)
-        
-        # Update game
+        # Update game with gesture (with cooldown to prevent rapid inputs)
         if current_game and not current_game.game_over:
-            if gesture != "NONE":
+            if gesture != "NONE" and (current_time - last_gesture_time) > gesture_cooldown:
                 current_game.handle_gesture(gesture)
+                last_gesture_time = current_time
             current_game.update()
         
         # Draw game
@@ -617,13 +660,29 @@ def run_game():
         pygame.display.flip()
         clock.tick(60)
         
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        # Check for quit
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_q]:
             break
     
     cap.release()
     cv2.destroyAllWindows()
     pygame.quit()
+    print(f"✅ Game closed. Final score: {current_game.score if current_game else 0}")
 
 
 if __name__ == "__main__":
-    run_game()
+    try:
+        run_game()
+    except KeyboardInterrupt:
+        print("\n🛑 Game interrupted by user")
+        cap.release()
+        cv2.destroyAllWindows()
+        pygame.quit()
+        sys.exit(0)
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        cap.release()
+        cv2.destroyAllWindows()
+        pygame.quit()
+        sys.exit(1)

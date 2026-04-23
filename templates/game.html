@@ -211,29 +211,34 @@
 let gameRunning = false;
 let gameStartTime = 0;
 let gameScore = 0;
+let updateInterval = null;
 
 // 🎯 Update game gesture in real-time
-setInterval(() => {
+function updateGameStatus() {
     if (gameRunning) {
         fetch('/get-gesture')
         .then(res => res.json())
         .then(data => {
-            document.getElementById("game-gesture").innerText = data.gesture;
+            // Display current gesture
+            const gestureText = data.gesture || "None";
+            document.getElementById("game-gesture").innerText = gestureText;
         })
-        .catch(err => console.error("Error:", err));
+        .catch(err => console.error("Error fetching gesture:", err));
     }
-}, 300);
+}
 
 // ⏱️ Update game timer
-setInterval(() => {
+function updateGameTimer() {
     if (gameRunning && gameStartTime > 0) {
         let elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
         document.getElementById("game-time").innerText = elapsed + "s";
     }
-}, 1000);
+}
 
 // ▶️ Start Game
-function startGame() {
+function startSystem(type) {
+    if (type !== "game") return;
+    
     const mode = document.getElementById("game-mode").value;
     const startBtn = document.getElementById("start-game-btn");
     const stopBtn = document.getElementById("stop-game-btn");
@@ -249,6 +254,12 @@ function startGame() {
     })
     .then(res => res.json())
     .then(data => {
+        console.log("Game started:", data);
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
         gameRunning = true;
         gameStartTime = Date.now();
         gameScore = 0;
@@ -258,23 +269,32 @@ function startGame() {
         document.getElementById("game-time").innerText = "0s";
         
         document.getElementById("game-status").className = "status running";
-        document.getElementById("game-status").innerText = "● Running";
+        document.getElementById("game-status").innerText = "● Running - " + mode.toUpperCase();
         
         stopBtn.disabled = false;
         
         // Show instructions
         document.getElementById("game-instructions-panel").style.display = "block";
+        
+        // Start update intervals
+        updateInterval = setInterval(() => {
+            updateGameStatus();
+            updateGameTimer();
+        }, 300);
     })
     .catch(err => {
-        console.error("Error:", err);
+        console.error("Error starting game:", err);
         document.getElementById("game-status").className = "status stopped";
-        document.getElementById("game-status").innerText = "● Error";
+        document.getElementById("game-status").innerText = "● Error: " + err.message;
         startBtn.disabled = false;
+        alert("Failed to start game: " + err.message);
     });
 }
 
 // 🛑 Stop Game
-function stopGame() {
+function stopSystem(type) {
+    if (type !== "game") return;
+    
     const startBtn = document.getElementById("start-game-btn");
     const stopBtn = document.getElementById("stop-game-btn");
 
@@ -288,6 +308,12 @@ function stopGame() {
         gameRunning = false;
         gameStartTime = 0;
         
+        // Clear update interval
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
+        
         document.getElementById("game-gesture").innerText = "None";
         document.getElementById("game-status").className = "status stopped";
         document.getElementById("game-status").innerText = "● Stopped";
@@ -296,8 +322,9 @@ function stopGame() {
         stopBtn.disabled = true;
     })
     .catch(err => {
-        console.error("Error:", err);
+        console.error("Error stopping game:", err);
         stopBtn.disabled = false;
+        alert("Error stopping game: " + err.message);
     });
 }
 
